@@ -1,11 +1,31 @@
 pipeline {
-  agent any
+  agent {
+    node {
+      label 'ubuntu'
+    }
+
+  }
   stages {
-    stage('') {
+    stage('Admit') {
       steps {
-        sh 'echo "Hello pipeline!"'
+        sh 'echo "Admitted!"'
       }
     }
 
+    stage('Build') {
+      steps {
+        sh 'echo "Built!"'
+      }
+    }
+
+    stage('Test') {
+      steps {
+        sh 'echo "Tested!"'
+      }
+    }
+
+  }
+  environment {
+    EXAMPLE_ENV = 'example_value'
   }
 }
