@@ -20,6 +20,7 @@ pipeline {
 
     stage('Test') {
       steps {
+        sh 'echo "Some minor test ..."'
         sh 'echo "Tested!"'
       }
     }
