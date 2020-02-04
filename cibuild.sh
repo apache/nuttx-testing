@@ -24,7 +24,7 @@ apps=$WD/../apps
 tools=$WD/../tools
 prebuilt=$WD/../prebuilt
 
-install="gen-romfs kconfig-frontends arm-gcc-toolchain mips-gcc-toolchain riscv-gcc-toolchain c-cache"
+install="gen-romfs gperf kconfig-frontends arm-gcc-toolchain mips-gcc-toolchain riscv-gcc-toolchain c-cache"
 
 function add_path {
   PATH=$1:$PATH
@@ -43,6 +43,20 @@ function gen-romfs {
     make install PREFIX=$prebuilt/genromfs
     cd $prebuilt
     rm -rf genromfs-0.5.2
+  fi
+}
+
+function gperf {
+  add_path $prebuilt/gperf/bin
+
+  if [ ! -f "$prebuilt/gperf/bin/gperf" ]; then
+    cd $prebuilt
+    wget http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz
+    tar zxf gperf-3.1.tar.gz
+    cd $prebuilt/gperf-3.1
+    ./configure --prefix=$prebuilt/gperf; make; make install
+    cd $prebuilt
+    rm -rf gperf-3.1; rm gperf-3.1.tar.gz
   fi
 }
 
