@@ -172,12 +172,13 @@ function install_tools {
 
 function run_builds {
   local ncpus=`grep -c ^processor /proc/cpuinfo`
+  local options="-si -j $ncpus"
 
-  $nuttx/tools/testbuild.sh -si -j $ncpus $WD/testlist/${build}list.dat
-  if [ $? != 0 ]; then
-    echo "ERROR: $BUILD build failed (error $?)"
-    exit 1
+  if [ "X$build" = "Xcheck" ]; then
+    options="$options -x"
   fi
+
+  $nuttx/tools/testbuild.sh $options $WD/testlist/${build}list.dat
 }
 
 if [ -z "$1" ]; then
