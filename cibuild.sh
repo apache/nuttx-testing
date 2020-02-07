@@ -18,7 +18,7 @@
 # under the License.
 set -e -x
 
-WD=$PWD
+WD=$(cd $(dirname $0) && pwd)
 nuttx=$WD/../nuttx
 apps=$WD/../apps
 tools=$WD/../tools
