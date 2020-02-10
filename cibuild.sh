@@ -199,6 +199,7 @@ while [ ! -z "$1" ]; do
   -b )
     shift
     build="$1"
+    run_builds
     break
     ;;
   -s )
@@ -210,9 +211,3 @@ while [ ! -z "$1" ]; do
   esac
   shift
 done
-
-if [ ! -z "$build" ]; then
-  install_tools
-  setup_repos
-  run_builds
-fi
