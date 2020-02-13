@@ -1,0 +1,13 @@
+#!/usr/bin/expect -f
+
+# Wait enough (forever) until a long-time boot
+set timeout -1
+
+# Start the guest VM (in interactive mode, but not in terminal mode, so it will shutdown on exit)
+spawn docker run -i --rm nuttx
+
+expect "nsh>"
+send "ls\n"
+
+expect "nsh>"
+
