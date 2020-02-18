@@ -172,7 +172,7 @@ function install_tools {
 
 function run_builds {
   local ncpus=`grep -c ^processor /proc/cpuinfo`
-  local options="-si -j $ncpus"
+  local options="-j $ncpus"
 
   if [ "X$build" = "Xcheck" ]; then
     options="$options -x"
