@@ -31,6 +31,8 @@
 
 /sim
 -sim:cxxtest
+-sim:mtdpart
+-sim:mtdrwb
 -sim:nxwm
 -sim:rpproxy
 -sim:rpserver
