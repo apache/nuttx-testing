@@ -1,0 +1,9 @@
+/arm/imx6,CONFIG_ARMV7M_TOOLCHAIN_GNU_EABIL
+
+/arm/imxrt,CONFIG_ARMV7M_TOOLCHAIN_GNU_EABIL
+-imxrt1050-evk:libcxxtest
+-imxrt1060-evk:libcxxtest
+
+/arm/kinetis,CONFIG_ARMV7M_TOOLCHAIN_GNU_EABIL
+
+/arm/kl,CONFIG_ARMV7M_TOOLCHAIN_GNU_EABIL

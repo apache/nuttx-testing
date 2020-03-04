@@ -1,0 +1,8 @@
+/arm/sama5,CONFIG_ARMV7M_TOOLCHAIN_GNU_EABIL
+-sama5d3x-ek:nxwm
+-sama5d4-ek:dramboot
+-sama5d4-ek:elf
+
+/arm/samd2l2,CONFIG_ARMV7M_TOOLCHAIN_GNU_EABIL
+
+/arm/samd5e5,CONFIG_ARMV7M_TOOLCHAIN_GNU_EABIL
