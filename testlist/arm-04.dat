@@ -1,0 +1,12 @@
+/arm/lpc17xx_40xx/olimex-lpc1766stk,CONFIG_ARMV7M_TOOLCHAIN_GNU_EABIL
+-olimex-lpc1766stk:slip-httpd
+-olimex-lpc1766stk:thttpd-nxflat
+
+/arm/lpc17xx_40xx/open1788,CONFIG_ARMV7M_TOOLCHAIN_GNU_EABIL
+
+/arm/lpc17xx_40xx/pnev5180b,CONFIG_ARMV7M_TOOLCHAIN_GNU_EABIL
+
+/arm/lpc17xx_40xx/u-blox-c027,CONFIG_ARMV7M_TOOLCHAIN_GNU_EABIL
+
+/arm/lpc17xx_40xx/zkit-arm-1769,CONFIG_ARMV7M_TOOLCHAIN_GNU_EABIL
+-zkit-arm-1769:thttpd

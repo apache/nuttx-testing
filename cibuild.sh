@@ -129,15 +129,16 @@ function c-cache {
 
 function usage {
   echo ""
-  echo "USAGE: $0 [-i] [-s] [-c] [-b <check|full>]"
+  echo "USAGE: $0 [-i] [-s] [-c] [-*] <testlist>"
   echo "       $0 -h"
   echo ""
   echo "Where:"
   echo "  -i install tools"
   echo "  -s setup repos"
   echo "  -c enable ccache"
-  echo "  -b <check|full> do check or full CI Job"
+  echo "  -* support all options in testbuild.sh"
   echo "  -h will show this help test and terminate"
+  echo "  <testlist> select testlist file"
   echo ""
   exit 1
 }
@@ -172,13 +173,14 @@ function install_tools {
 
 function run_builds {
   local ncpus=`grep -c ^processor /proc/cpuinfo`
-  local options="-j $ncpus"
+  options+="-j $ncpus"
 
-  if [ "X$build" = "Xcheck" ]; then
-    options="$options -x"
-  fi
+  for build in $builds; do
+    local builddir=$(cd $(dirname $build) && pwd)
+    local buildfile=$(basename $build)
 
-  $nuttx/tools/testbuild.sh $options $WD/testlist/${build}list.dat
+    $nuttx/tools/testbuild.sh $options $builddir/$buildfile
+  done
 }
 
 if [ -z "$1" ]; then
@@ -196,18 +198,18 @@ while [ ! -z "$1" ]; do
   -c )
     enable_ccache
     ;;
-  -b )
-    shift
-    build="$1"
-    run_builds
-    break
-    ;;
   -s )
     setup_repos
     ;;
+  -* )
+    options+="$1 "
+    ;;
   * )
-    usage
+    builds=$@
+    break
     ;;
   esac
   shift
 done
+
+run_builds
