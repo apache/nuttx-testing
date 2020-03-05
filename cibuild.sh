@@ -152,6 +152,7 @@ function enable_ccache {
 }
 
 function setup_repos {
+  pushd .
   if [ -d "$nuttx" ]; then
     cd $nuttx; git pull
   else
@@ -163,12 +164,15 @@ function setup_repos {
   else
     git clone https://github.com/apache/incubator-nuttx-apps.git $apps
   fi
+  popd
 }
 
 function install_tools {
+  pushd .
   for func in $install; do
     $func
   done
+  popd
 }
 
 function run_builds {
@@ -176,10 +180,7 @@ function run_builds {
   options+="-j $ncpus"
 
   for build in $builds; do
-    local builddir=$(cd $(dirname $build) && pwd)
-    local buildfile=$(basename $build)
-
-    $nuttx/tools/testbuild.sh $options $builddir/$buildfile
+    $nuttx/tools/testbuild.sh $options $build
   done
 }
 
