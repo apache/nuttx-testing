@@ -35,7 +35,7 @@ function gen-romfs {
 
   if [ ! -f "$prebuilt/genromfs/usr/bin/genromfs" ]; then
     if [ ! -d "$tools" ]; then
-      git clone https://github.com/nuttx/tools.git $tools
+      git clone https://bitbucket.org/nuttx/tools.git $tools
     fi
     mkdir -p $prebuilt; cd $tools
     tar zxf genromfs-0.5.2.tar.gz -C $prebuilt
