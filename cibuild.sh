@@ -24,7 +24,7 @@ apps=$WD/../apps
 tools=$WD/../tools
 prebuilt=$WD/../prebuilt
 
-install="gen-romfs gperf kconfig-frontends arm-gcc-toolchain mips-gcc-toolchain riscv-gcc-toolchain c-cache"
+install="gen-romfs gperf kconfig-frontends arm-gcc-toolchain mips-gcc-toolchain riscv-gcc-toolchain xtensa-esp32-gcc-toolchain c-cache"
 
 function add_path {
   PATH=$1:$PATH
@@ -105,6 +105,19 @@ function riscv-gcc-toolchain {
     rm riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14.tar.gz
   fi
   riscv64-unknown-elf-gcc --version
+}
+
+function xtensa-esp32-gcc-toolchain {
+  add_path $prebuilt/xtensa-esp32-elf/bin
+
+  if [ ! -f "$prebuilt/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc" ]; then
+    cd $prebuilt
+    wget https://dl.espressif.com/dl/xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-rc2-linux-amd64.tar.xz
+    xz -d xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-rc2-linux-amd64.tar.xz
+    tar xf xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-rc2-linux-amd64.tar
+    rm xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-rc2-linux-amd64.tar
+  fi
+  xtensa-esp32-elf-gcc --version
 }
 
 function c-cache {

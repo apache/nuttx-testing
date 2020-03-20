@@ -36,3 +36,5 @@
 -sim:rpserver
 
 /x86
+
+/xtensa
