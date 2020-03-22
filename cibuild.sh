@@ -24,10 +24,17 @@ apps=$WD/../apps
 tools=$WD/../tools
 prebuilt=$WD/../prebuilt
 
-install="gen-romfs gperf kconfig-frontends arm-gcc-toolchain mips-gcc-toolchain riscv-gcc-toolchain xtensa-esp32-gcc-toolchain c-cache"
+install="python-tools gen-romfs gperf kconfig-frontends arm-gcc-toolchain mips-gcc-toolchain riscv-gcc-toolchain xtensa-esp32-gcc-toolchain c-cache"
 
 function add_path {
   PATH=$1:$PATH
+}
+
+function python-tools {
+  # Python User Env
+  PIP_USER=yes
+  PYTHONUSERBASE=$prebuilt/pylocal
+  add_path $PYTHONUSERBASE/bin
 }
 
 function gen-romfs {
@@ -118,6 +125,7 @@ function xtensa-esp32-gcc-toolchain {
     rm xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-rc2-linux-amd64.tar
   fi
   xtensa-esp32-elf-gcc --version
+  pip install esptool
 }
 
 function c-cache {
