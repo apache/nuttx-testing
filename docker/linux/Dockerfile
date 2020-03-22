@@ -30,7 +30,7 @@ RUN apt-get install -y -qq \
   bison \
   gperf \
   libncurses5-dev \
-  make 
+  make
 
 RUN mkdir /tools
 WORKDIR /tools
@@ -96,6 +96,27 @@ RUN mkdir xtensa-esp32-elf-gcc && \
   curl -s -L "https://dl.espressif.com/dl/xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-rc2-linux-amd64.tar.xz" \
   | tar -C xtensa-esp32-elf-gcc --strip-components 1 -xJ
 
+RUN apt-get install -y -qq --no-install-recommends \
+  git bison gperf python python-pip python-setuptools make cmake ninja-build ccache libffi-dev libssl-dev libusb-1.0
+RUN git clone --depth 1 --shallow-submodules --recursive https://github.com/espressif/esp-idf.git
+# This is unfortunatly going to re-download some of the same toolchains, but will only be used in the context of esp-idf
+RUN bash -c "\
+  cd esp-idf && \
+  ./install.sh"
+
+# We run this is generate the default bootloader and partition table binaries
+RUN bash -c "\
+  cd esp-idf && \
+  source ./export.sh && \
+  cd examples/get-started/hello_world && \
+  make defconfig && \
+  echo "CONFIG_ESPTOOLPY_FLASHMODE_DOUT=y" >> sdkconfig && \
+  idf.py bootloader partition_table"
+
+RUN mkdir /tools/blobs
+RUN cp /tools/esp-idf/examples/get-started/hello_world/build/bootloader/bootloader.bin /tools/blobs/
+RUN cp /tools/esp-idf/examples/get-started/hello_world/build/partition_table/partition-table.bin /tools/blobs/
+
 
 ###############################################################################
 # Final Docker image used for running CI system.  This includes all toolchains
@@ -109,6 +130,8 @@ RUN dpkg --add-architecture i386
 RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends \
   git \
   build-essential \
+  gcc \
+  gcc-multilib \
   wget \
   libx11-dev \
   libxext-dev \
@@ -117,6 +140,7 @@ RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends \
   libc6-dev-i386 \
   libx11-dev:i386 \
   libxext-dev:i386 \
+  linux-libc-dev:i386 \
   curl \
   gettext \
   libcurl4-openssl-dev \
@@ -161,6 +185,8 @@ ENV PATH="/tools/riscv64-unknown-elf-gcc/bin:$PATH"
 # ESP32 toolchain
 COPY --from=nuttx-toolchain-esp32 /tools/xtensa-esp32-elf-gcc/ xtensa-esp32-elf-gcc/
 ENV PATH="/tools/xtensa-esp32-elf-gcc/bin:$PATH"
+RUN mkdir -p /tools/blobs/esp32core
+COPY --from=nuttx-toolchain-esp32 /tools/blobs/* /tools/blobs/esp32core/
 RUN pip3 install esptool
 
 ENTRYPOINT [ "/bin/bash" ]
