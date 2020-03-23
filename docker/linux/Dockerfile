@@ -150,10 +150,9 @@ ENV PATH="/tools/kconfig-frontends/bin:$PATH"
 COPY --from=nuttx-toolchain-arm /tools/gcc-arm-none-eabi/ gcc-arm-none-eabi/
 ENV PATH="/tools/gcc-arm-none-eabi/bin:$PATH"
 
+# MIPS toolchain
 COPY --from=nuttx-toolchain-pinguino /tools/pinguino-compilers/p32/ pinguino-compilers/p32/
 ENV PATH="/tools/pinguino-compilers/p32/bin:$PATH"
-#COPY --from=nuttx-toolchain-pinguino /tools/pinguino-compilers/p8/ pinguino-compilers/p8/
-#ENV PATH="/tools/pinguino-compilers/p8/bin:$PATH"
 
 # RISCV toolchain
 COPY --from=nuttx-toolchain-riscv /tools/riscv64-unknown-elf-gcc/ riscv64-unknown-elf-gcc/
