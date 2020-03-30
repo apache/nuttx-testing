@@ -1,9 +1,13 @@
-/mips,CONFIG_MIPS32_TOOLCHAIN_PINGUINOL
+# PINGUINOL toolchain doesn't provide macOS binaries
+# with the same name
+# /mips,CONFIG_MIPS32_TOOLCHAIN_PINGUINOL
 
 /risc-v,CONFIG_RV32IM_TOOLCHAIN_GNU_RVGL
 -gapuino:nsh
 -nr5m100-nexys4:nsh
 
-/x86
+# x86_64-elf-gcc from homebrew doesn't seem to
+# provide __udivdi3 etc for -m32
+# /x86
 
 /xtensa

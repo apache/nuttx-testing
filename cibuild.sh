@@ -23,8 +23,18 @@ nuttx=$WD/../nuttx
 apps=$WD/../apps
 tools=$WD/../tools
 prebuilt=$WD/../prebuilt
+os=$(uname -s)
 
-install="python-tools gen-romfs gperf kconfig-frontends arm-gcc-toolchain mips-gcc-toolchain riscv-gcc-toolchain xtensa-esp32-gcc-toolchain c-cache"
+case $os in
+  Darwin)
+    install="python-tools u-boot-tools discoteq-flock elf-toolchain gen-romfs kconfig-frontends arm-gcc-toolchain riscv-gcc-toolchain xtensa-esp32-gcc-toolchain"
+    mkdir -p ${prebuilt}/homebrew
+    export HOMEBREW_CACHE=${prebuilt}/homebrew
+    ;;
+  Linux)
+    install="python-tools gen-romfs gperf kconfig-frontends arm-gcc-toolchain mips-gcc-toolchain riscv-gcc-toolchain xtensa-esp32-gcc-toolchain c-cache"
+    ;;
+esac
 
 function add_path {
   PATH=$1:$PATH
@@ -35,6 +45,38 @@ function python-tools {
   PIP_USER=yes
   PYTHONUSERBASE=$prebuilt/pylocal
   add_path $PYTHONUSERBASE/bin
+}
+
+function u-boot-tools {
+  if ! type mkimage > /dev/null; then
+    case $os in
+      Darwin)
+        brew install u-boot-tools
+        ;;
+    esac
+  fi
+}
+
+function discoteq-flock {
+  if ! type flock > /dev/null; then
+    case $os in
+      Darwin)
+        brew tap discoteq/discoteq
+        brew install flock
+        ;;
+    esac
+  fi
+}
+
+function elf-toolchain {
+  if ! type x86_64-elf-gcc > /dev/null; then
+    case $os in
+      Darwin)
+        brew install x86_64-elf-gcc
+        ;;
+    esac
+  fi
+  x86_64-elf-gcc --version
 }
 
 function gen-romfs {
@@ -87,11 +129,20 @@ function arm-gcc-toolchain {
   add_path $prebuilt/gcc-arm-none-eabi/bin
 
   if [ ! -f "$prebuilt/gcc-arm-none-eabi/bin/arm-none-eabi-gcc" ]; then
+    local flavor
+    case $os in
+      Darwin)
+        flavor=mac
+        ;;
+      Linux)
+        flavor=x86_64-linux
+        ;;
+    esac
     cd $prebuilt
-    wget https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2
-    tar jxf gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2
+    wget https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1/gcc-arm-none-eabi-9-2019-q4-major-${flavor}.tar.bz2
+    tar jxf gcc-arm-none-eabi-9-2019-q4-major-${flavor}.tar.bz2
     mv gcc-arm-none-eabi-9-2019-q4-major gcc-arm-none-eabi
-    rm gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2
+    rm gcc-arm-none-eabi-9-2019-q4-major-${flavor}.tar.bz2
   fi
   arm-none-eabi-gcc --version
 }
@@ -110,11 +161,20 @@ function riscv-gcc-toolchain {
   add_path $prebuilt/riscv64-unknown-elf-gcc/bin
 
   if [ ! -f "$prebuilt/riscv64-unknown-elf-gcc/bin/riscv64-unknown-elf-gcc" ]; then
+    local flavor
+    case $os in
+      Darwin)
+        flavor=x86_64-apple-darwin
+        ;;
+      Linux)
+        flavor=x86_64-linux-ubuntu14
+        ;;
+    esac
     cd $prebuilt
-    wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14.tar.gz
-    tar zxf riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14.tar.gz
-    mv riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14 riscv64-unknown-elf-gcc
-    rm riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14.tar.gz
+    wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-${flavor}.tar.gz
+    tar zxf riscv64-unknown-elf-gcc-8.3.0-2019.08.0-${flavor}.tar.gz
+    mv riscv64-unknown-elf-gcc-8.3.0-2019.08.0-${flavor} riscv64-unknown-elf-gcc
+    rm riscv64-unknown-elf-gcc-8.3.0-2019.08.0-${flavor}.tar.gz
   fi
   riscv64-unknown-elf-gcc --version
 }
@@ -124,10 +184,19 @@ function xtensa-esp32-gcc-toolchain {
 
   if [ ! -f "$prebuilt/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc" ]; then
     cd $prebuilt
-    wget https://dl.espressif.com/dl/xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-rc2-linux-amd64.tar.xz
-    xz -d xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-rc2-linux-amd64.tar.xz
-    tar xf xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-rc2-linux-amd64.tar
-    rm xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-rc2-linux-amd64.tar
+    case $os in
+      Darwin)
+        wget https://dl.espressif.com/dl/xtensa-esp32-elf-gcc8_2_0-esp-2019r2-macos.tar.gz
+        tar xzf xtensa-esp32-elf-gcc8_2_0-esp-2019r2-macos.tar.gz
+        rm xtensa-esp32-elf-gcc8_2_0-esp-2019r2-macos.tar.gz
+        ;;
+      Linux)
+        wget https://dl.espressif.com/dl/xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-rc2-linux-amd64.tar.xz
+        xz -d xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-rc2-linux-amd64.tar.xz
+        tar xf xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-rc2-linux-amd64.tar
+        rm xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-rc2-linux-amd64.tar
+        ;;
+    esac
   fi
   xtensa-esp32-elf-gcc --version
   pip install esptool
@@ -206,7 +275,17 @@ function install_tools {
 }
 
 function run_builds {
-  local ncpus=`grep -c ^processor /proc/cpuinfo`
+  local ncpus
+
+  case $os in
+    Darwin)
+      ncpus=$(sysctl -n machdep.cpu.thread_count)
+      ;;
+    Linux)
+      ncpus=`grep -c ^processor /proc/cpuinfo`
+      ;;
+  esac
+
   options+="-j $ncpus"
 
   for build in $builds; do
