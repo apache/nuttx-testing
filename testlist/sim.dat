@@ -3,3 +3,15 @@
 -sim:nxwm
 -sim:rpproxy
 -sim:rpserver
+
+# X11
+# macOS doesn't have X11
+-sim:nxlines
+-sim:touchscreen
+-sim:nx11
+-sim:nsh2
+
+# CONFIG_SIM_M32=y
+# The recent versions of macOS is 64-bit only
+-sim:loadable
+-sim:module32
