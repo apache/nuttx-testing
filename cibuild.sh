@@ -76,6 +76,8 @@ function kconfig-frontends {
       --disable-kconfig --disable-nconf --disable-qconf \
       --disable-gconf --disable-mconf --disable-static \
       --disable-shared --disable-L10n --disable-utils
+    # Avoid "aclocal/automake missing" errors
+    touch aclocal.m4 Makefile.in
     make install
     cd $tools; git clean -xfd
   fi
