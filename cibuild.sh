@@ -70,9 +70,12 @@ function gperf {
 function kconfig-frontends {
   add_path $prebuilt/kconfig-frontends/bin
 
-  if [ ! -f "$prebuilt/kconfig-frontends/bin/kconfig-mconf" ]; then
+  if [ ! -f "$prebuilt/kconfig-frontends/bin/kconfig-conf" ]; then
     cd $tools/kconfig-frontends
-    ./configure --prefix=$prebuilt/kconfig-frontends --enable-mconf --disable-gconf --disable-qconf --enable-static
+    ./configure --prefix=$prebuilt/kconfig-frontends \
+      --disable-kconfig --disable-nconf --disable-qconf \
+      --disable-gconf --disable-mconf --disable-static \
+      --disable-shared --disable-L10n --disable-utils
     make install
     cd $tools; git clean -xfd
   fi
