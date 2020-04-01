@@ -33,6 +33,14 @@ jobs:
         path: testing
         fetch-depth: 0
 
+    - name: Install prerequisites
+      run: |
+        sudo apt-get update
+        # coreutils: sort
+        # mawk: awk
+        # diffutils: diff
+        sudo apt-get install -y coreutils mawk diffutils
+
     - name: Check Test List
       run: |
         ./testing/checktestlist.sh
