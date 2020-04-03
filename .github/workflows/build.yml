@@ -67,4 +67,4 @@ jobs:
       with:
         run: |
           cd testing
-          ./cibuild.sh -x testlist/${{matrix.boards}}.dat
+          ./cibuild.sh -x -G testlist/${{matrix.boards}}.dat
