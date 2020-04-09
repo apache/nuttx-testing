@@ -1,0 +1,23 @@
+github:
+  description: "Apache NuttX Testing contains shared test infrastructure for Apache NuttX (incubating)"
+  homepage: https://nuttx.apache.org/
+  features:
+    # Enable issues management
+    issues: true
+    # Enable project for project management boards
+    projects: true
+  labels:
+    - nuttx
+    - rtos
+    - embedded
+    - real-time
+    - mcu
+    - microcontroller
+    - ci
+  enabled_merge_buttons:
+    # enable squash button:
+    squash:  true
+    # enable merge button:
+    merge:   true
+    # enable rebase button:
+    rebase:  true
