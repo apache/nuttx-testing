@@ -117,7 +117,7 @@ function kconfig-frontends {
     ./configure --prefix=$prebuilt/kconfig-frontends \
       --disable-kconfig --disable-nconf --disable-qconf \
       --disable-gconf --disable-mconf --disable-static \
-      --disable-shared --disable-L10n --disable-utils
+      --disable-shared --disable-L10n
     # Avoid "aclocal/automake missing" errors
     touch aclocal.m4 Makefile.in
     make install
