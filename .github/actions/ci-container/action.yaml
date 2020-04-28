@@ -15,6 +15,7 @@ name: ci-container
 runs:
   using: 'docker'
   image: 'docker.pkg.github.com/apache/incubator-nuttx-testing/nuttx-ci-linux'
+  options: --mount type=tmpfs,destination=/tmpworkspace
   args:
     - "-c"
     - ${{ inputs.run }}

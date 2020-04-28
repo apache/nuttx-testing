@@ -71,6 +71,8 @@ jobs:
         BLOBDIR: /tools/blobs
       with:
         run: |
+          SOURCE_DIR=`pwd`
+          cd /tmpworkspace && cp -r $SOURCE_DIR/* ./
           cd testing
           ./cibuild.sh -x -G testlist/${{matrix.boards}}.dat
 
