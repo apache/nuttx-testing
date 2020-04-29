@@ -6,15 +6,10 @@
 -imxrt1060-evk:libcxxtest
 -launchxl-cc1310:nsh
 -launchxl-tms57004:nsh
--lincoln60:thttpd-binfs
 -lpcxpresso-lpc1768:thttpd
--mikroe-stm32f4:fulldemo
 -moxa:nsh
 -olimex-lpc1766stk:slip-httpd
 -olimex-lpc1766stk:thttpd-nxflat
--olimex-stm32-p407:kelf
--sama5d3x-ek:nxwm
--sama5d4-ek:dramboot
 -sama5d4-ek:elf
 -shenzhou:thttpd
 -stm32f4discovery:cxxtest
@@ -31,9 +26,6 @@
 
 /sim
 -sim:cxxtest
--sim:nxwm
--sim:rpproxy
--sim:rpserver
 
 /x86
 
