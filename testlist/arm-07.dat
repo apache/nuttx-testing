@@ -1,7 +1,6 @@
 /arm/stm32/maple,CONFIG_ARMV7M_TOOLCHAIN_GNU_EABIL
 
 /arm/stm32/mikroe-stm32f4,CONFIG_ARMV7M_TOOLCHAIN_GNU_EABIL
--mikroe-stm32f4:fulldemo
 
 /arm/stm32/nucleo-f103rb,CONFIG_ARMV7M_TOOLCHAIN_GNU_EABIL
 
