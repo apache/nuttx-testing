@@ -26,10 +26,11 @@
 set -e
 
 WD=$(cd $(dirname $0) && pwd)
-nuttx=$WD/../nuttx
-apps=$WD/../apps
-tools=$WD/../tools
-prebuilt=$WD/../prebuilt
+WORKSPACE=$(cd $WD/.. && pwd -P)
+nuttx=$WORKSPACE/nuttx
+apps=$WORKSPACE/apps
+tools=$WORKSPACE/tools
+prebuilt=$WORKSPACE/prebuilt
 os=$(uname -s)
 EXTRA_PATH=
 
