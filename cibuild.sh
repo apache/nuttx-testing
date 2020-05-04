@@ -31,6 +31,7 @@ apps=$WD/../apps
 tools=$WD/../tools
 prebuilt=$WD/../prebuilt
 os=$(uname -s)
+EXTRA_PATH=
 
 case $os in
   Darwin)
@@ -45,6 +46,7 @@ esac
 
 function add_path {
   PATH=$1:$PATH
+  EXTRA_PATH=$1:$EXTRA_PATH
 }
 
 function python-tools {
@@ -281,6 +283,8 @@ function install_tools {
     $func
   done
   popd
+
+  echo PATH=$EXTRA_PATH\$PATH > $prebuilt/env.sh
 }
 
 function run_builds {
