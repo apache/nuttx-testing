@@ -17,6 +17,12 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# Prerequisites for macOS
+#  - Xcode (cc, etc)
+#  - homebrew
+#  - autoconf
+#  - wget
+
 set -e
 
 WD=$(cd $(dirname $0) && pwd)
