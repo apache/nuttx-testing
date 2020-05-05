@@ -10,4 +10,6 @@
 # provide __udivdi3 etc for -m32
 # /x86
 
+/x86_64
+
 /xtensa
