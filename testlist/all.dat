@@ -10,7 +10,6 @@
 -moxa:nsh
 -olimex-lpc1766stk:slip-httpd
 -olimex-lpc1766stk:thttpd-nxflat
--sama5d4-ek:elf
 -shenzhou:thttpd
 -stm32f4discovery:cxxtest
 -stm32f4discovery:testlibcxx
