@@ -1,5 +1,4 @@
 /arm,CONFIG_ARMV7M_TOOLCHAIN_GNU_EABIL
--ea3131:pgnsh
 -eagle100:nxflat
 -eagle100:thttpd
 -imxrt1050-evk:libcxxtest
