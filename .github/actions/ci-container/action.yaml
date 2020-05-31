@@ -12,6 +12,10 @@
 #
 
 name: ci-container
+inputs:
+  run:  # id of input
+    description: 'Commands to run'
+    required: true
 runs:
   using: 'docker'
   image: 'docker.pkg.github.com/apache/incubator-nuttx-testing/nuttx-ci-linux'
