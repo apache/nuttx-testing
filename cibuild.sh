@@ -112,7 +112,7 @@ function gperf {
 
   if [ ! -f "$prebuilt/gperf/bin/gperf" ]; then
     cd $prebuilt
-    wget http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz
+    wget --quiet http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz
     tar zxf gperf-3.1.tar.gz
     cd $prebuilt/gperf-3.1
     ./configure --prefix=$prebuilt/gperf; make; make install
@@ -151,7 +151,7 @@ function arm-gcc-toolchain {
         ;;
     esac
     cd $prebuilt
-    wget https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1/gcc-arm-none-eabi-9-2019-q4-major-${flavor}.tar.bz2
+    wget --quiet https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1/gcc-arm-none-eabi-9-2019-q4-major-${flavor}.tar.bz2
     tar jxf gcc-arm-none-eabi-9-2019-q4-major-${flavor}.tar.bz2
     mv gcc-arm-none-eabi-9-2019-q4-major gcc-arm-none-eabi
     rm gcc-arm-none-eabi-9-2019-q4-major-${flavor}.tar.bz2
@@ -183,7 +183,7 @@ function riscv-gcc-toolchain {
         ;;
     esac
     cd $prebuilt
-    wget https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-${flavor}.tar.gz
+    wget --quiet https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-${flavor}.tar.gz
     tar zxf riscv64-unknown-elf-gcc-8.3.0-2019.08.0-${flavor}.tar.gz
     mv riscv64-unknown-elf-gcc-8.3.0-2019.08.0-${flavor} riscv64-unknown-elf-gcc
     rm riscv64-unknown-elf-gcc-8.3.0-2019.08.0-${flavor}.tar.gz
@@ -198,12 +198,12 @@ function xtensa-esp32-gcc-toolchain {
     cd $prebuilt
     case $os in
       Darwin)
-        wget https://dl.espressif.com/dl/xtensa-esp32-elf-gcc8_2_0-esp-2019r2-macos.tar.gz
+        wget --quiet https://dl.espressif.com/dl/xtensa-esp32-elf-gcc8_2_0-esp-2019r2-macos.tar.gz
         tar xzf xtensa-esp32-elf-gcc8_2_0-esp-2019r2-macos.tar.gz
         rm xtensa-esp32-elf-gcc8_2_0-esp-2019r2-macos.tar.gz
         ;;
       Linux)
-        wget https://dl.espressif.com/dl/xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-rc2-linux-amd64.tar.xz
+        wget --quiet https://dl.espressif.com/dl/xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-rc2-linux-amd64.tar.xz
         xz -d xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-rc2-linux-amd64.tar.xz
         tar xf xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-rc2-linux-amd64.tar
         rm xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-rc2-linux-amd64.tar
@@ -219,7 +219,7 @@ function c-cache {
 
   if [ ! -f "$prebuilt/ccache/bin/ccache" ]; then
     cd $prebuilt;
-    wget https://github.com/ccache/ccache/releases/download/v3.7.7/ccache-3.7.7.tar.gz
+    wget --quiet https://github.com/ccache/ccache/releases/download/v3.7.7/ccache-3.7.7.tar.gz
     tar zxf ccache-3.7.7.tar.gz
     cd ccache-3.7.7; ./configure --prefix=$prebuilt/ccache; make; make install
     cd $prebuilt; rm -rf ccache-3.7.7; rm ccache-3.7.7.tar.gz
