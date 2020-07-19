@@ -36,7 +36,7 @@ EXTRA_PATH=
 
 case $os in
   Darwin)
-    install="python-tools u-boot-tools discoteq-flock elf-toolchain gen-romfs kconfig-frontends arm-gcc-toolchain riscv-gcc-toolchain xtensa-esp32-gcc-toolchain"
+    install="python-tools u-boot-tools discoteq-flock elf-toolchain gen-romfs kconfig-frontends arm-gcc-toolchain riscv-gcc-toolchain xtensa-esp32-gcc-toolchain avr-gcc-toolchain"
     mkdir -p ${prebuilt}/homebrew
     export HOMEBREW_CACHE=${prebuilt}/homebrew
     ;;
@@ -212,6 +212,17 @@ function xtensa-esp32-gcc-toolchain {
   fi
   xtensa-esp32-elf-gcc --version
   pip3 install esptool
+}
+
+function avr-gcc-toolchain {
+  if ! type avr-gcc > /dev/null; then
+    case $os in
+      Darwin)
+        brew tap osx-cross/avr
+        brew install avr-gcc
+        ;;
+    esac
+  fi
 }
 
 function c-cache {
