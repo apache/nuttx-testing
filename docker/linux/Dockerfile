@@ -13,7 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-FROM ubuntu:19.04 AS builder-base
+FROM ubuntu:19.10 AS builder-base
 # NOTE WE ARE NOT REMOVEING APT CACHE.
 # This should only be used for temp build images that artifacts will be copied from
 RUN apt-get update -qq && apt-get install -y -qq \
@@ -122,7 +122,7 @@ RUN cp /tools/esp-idf/examples/get-started/hello_world/build/partition_table/par
 # Final Docker image used for running CI system.  This includes all toolchains
 # supported by the CI system.
 ###############################################################################
-FROM ubuntu:19.04
+FROM ubuntu:19.10
 LABEL maintainer="dev@nuttx.apache.org"
 
 RUN dpkg --add-architecture i386
@@ -132,6 +132,8 @@ RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends \
   build-essential \
   gcc \
   gcc-multilib \
+  gcc-avr \
+  avr-libc \
   wget \
   libx11-dev \
   libxext-dev \
