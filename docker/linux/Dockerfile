@@ -110,7 +110,6 @@ RUN bash -c "\
   source ./export.sh && \
   cd examples/get-started/hello_world && \
   make defconfig && \
-  echo "CONFIG_ESPTOOLPY_FLASHMODE_DOUT=y" >> sdkconfig && \
   idf.py bootloader partition_table"
 
 RUN mkdir /tools/blobs
