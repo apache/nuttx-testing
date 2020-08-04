@@ -185,6 +185,7 @@ ENV PATH="/tools/riscv64-unknown-elf-gcc/bin:$PATH"
  
 # ESP32 toolchain
 COPY --from=nuttx-toolchain-esp32 /tools/xtensa-esp32-elf-gcc/ xtensa-esp32-elf-gcc/
+COPY --from=nuttx-toolchain-esp32 /tools/esp-idf/ esp-idf/
 ENV PATH="/tools/xtensa-esp32-elf-gcc/bin:$PATH"
 RUN mkdir -p /tools/blobs/esp32core
 COPY --from=nuttx-toolchain-esp32 /tools/blobs/* /tools/blobs/esp32core/
