@@ -104,12 +104,16 @@ RUN bash -c "\
   cd esp-idf && \
   ./install.sh"
 
+# Provide an option for disabling DOUT mode, so that the default one,
+# DIO, can be used (for instance, for flashing a DevKitC module)
+ARG FLASH_DOUT_ENABLED=y
 # We run this is generate the default bootloader and partition table binaries
 RUN bash -c "\
   cd esp-idf && \
   source ./export.sh && \
   cd examples/get-started/hello_world && \
   make defconfig && \
+  if [[ '${FLASH_DOUT_ENABLED}' == y ]]; then echo 'CONFIG_ESPTOOLPY_FLASHMODE_DOUT=y' >> sdkconfig; fi && \
   idf.py bootloader partition_table"
 
 RUN mkdir /tools/blobs
