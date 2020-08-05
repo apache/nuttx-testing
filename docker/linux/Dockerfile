@@ -182,7 +182,7 @@ ENV PATH="/tools/pinguino-compilers/p32/bin:$PATH"
 # RISCV toolchain
 COPY --from=nuttx-toolchain-riscv /tools/riscv64-unknown-elf-gcc/ riscv64-unknown-elf-gcc/
 ENV PATH="/tools/riscv64-unknown-elf-gcc/bin:$PATH"
- 
+
 # ESP32 toolchain
 COPY --from=nuttx-toolchain-esp32 /tools/xtensa-esp32-elf-gcc/ xtensa-esp32-elf-gcc/
 COPY --from=nuttx-toolchain-esp32 /tools/esp-idf/ esp-idf/
@@ -191,4 +191,4 @@ RUN mkdir -p /tools/blobs/esp32core
 COPY --from=nuttx-toolchain-esp32 /tools/blobs/* /tools/blobs/esp32core/
 RUN pip3 install esptool
 
-ENTRYPOINT [ "/bin/bash" ]
+CMD [ "/bin/bash" ]
