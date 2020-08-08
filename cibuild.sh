@@ -36,12 +36,12 @@ EXTRA_PATH=
 
 case $os in
   Darwin)
-    install="python-tools u-boot-tools discoteq-flock elf-toolchain gen-romfs kconfig-frontends arm-gcc-toolchain riscv-gcc-toolchain xtensa-esp32-gcc-toolchain avr-gcc-toolchain"
+    install="python-tools u-boot-tools discoteq-flock elf-toolchain gen-romfs kconfig-frontends bloaty arm-gcc-toolchain riscv-gcc-toolchain xtensa-esp32-gcc-toolchain avr-gcc-toolchain"
     mkdir -p ${prebuilt}/homebrew
     export HOMEBREW_CACHE=${prebuilt}/homebrew
     ;;
   Linux)
-    install="python-tools gen-romfs gperf kconfig-frontends arm-gcc-toolchain mips-gcc-toolchain riscv-gcc-toolchain xtensa-esp32-gcc-toolchain c-cache"
+    install="python-tools gen-romfs gperf kconfig-frontends bloaty arm-gcc-toolchain mips-gcc-toolchain riscv-gcc-toolchain xtensa-esp32-gcc-toolchain c-cache"
     ;;
 esac
 
@@ -134,6 +134,19 @@ function kconfig-frontends {
     touch aclocal.m4 Makefile.in
     make install
     cd $tools; git clean -xfd
+  fi
+}
+
+function bloaty {
+  add_path $prebuilt/bloaty/bin
+  if [ ! -f "$prebuilt/bloaty/bin/bloaty" ]; then
+    git clone --depth 1 --branch v1.1 https://github.com/google/bloaty bloaty-src
+    cd bloaty-src
+    mkdir -p $prebuilt/bloaty
+    cmake -DCMAKE_SYSTEM_PREFIX_PATH=$prebuilt/bloaty
+    make install -j 6
+    cd $prebuilt
+    rm -rf bloaty-src
   fi
 }
 
