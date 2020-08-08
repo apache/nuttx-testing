@@ -25,12 +25,15 @@ RUN apt-get update -qq && apt-get install -y -qq \
 ###############################################################################
 FROM builder-base AS nuttx-tools
 
-RUN apt-get install -y -qq \
+RUN apt-get update -qq && apt-get install -y -qq \
   flex \
   bison \
   gperf \
   libncurses5-dev \
-  make
+  make \
+  cmake \
+  g++ \
+  git
 
 RUN mkdir /tools
 WORKDIR /tools
@@ -48,6 +51,12 @@ RUN cd nuttx-tools \
   && tar -C genromfs --strip-components=1 -xf genromfs-0.5.2.tar.gz \
   && cd genromfs \
   && make install PREFIX=/tools/genromfs
+
+RUN mkdir bloaty -p \
+  && git clone --depth 1 --branch v1.1 https://github.com/google/bloaty bloaty \
+  && cd bloaty \
+  && cmake -DCMAKE_SYSTEM_PREFIX_PATH=/tools/bloaty \
+  && make install
 
 CMD [ "/bin/bash" ]
 
@@ -96,7 +105,7 @@ RUN mkdir xtensa-esp32-elf-gcc && \
   curl -s -L "https://dl.espressif.com/dl/xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-rc2-linux-amd64.tar.xz" \
   | tar -C xtensa-esp32-elf-gcc --strip-components 1 -xJ
 
-RUN apt-get install -y -qq --no-install-recommends \
+RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends \
   git bison gperf python python-pip python-setuptools make cmake ninja-build ccache libffi-dev libssl-dev libusb-1.0
 RUN git clone --depth 1 --shallow-submodules --recursive https://github.com/espressif/esp-idf.git
 # This is unfortunatly going to re-download some of the same toolchains, but will only be used in the context of esp-idf
@@ -174,6 +183,8 @@ COPY --from=nuttx-tools /tools/genromfs/ /tools/genromfs/
 ENV PATH="/tools/genromfs/usr/bin:$PATH"
 COPY --from=nuttx-tools /tools/kconfig-frontends/ kconfig-frontends/
 ENV PATH="/tools/kconfig-frontends/bin:$PATH"
+COPY --from=nuttx-tools /tools/bloaty/ bloaty/
+ENV PATH="/tools/bloaty/bin:$PATH"
 
 # ARM toolchain
 COPY --from=nuttx-toolchain-arm /tools/gcc-arm-none-eabi/ gcc-arm-none-eabi/
