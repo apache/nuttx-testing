@@ -129,6 +129,53 @@ RUN mkdir /tools/blobs
 RUN cp /tools/esp-idf/examples/get-started/hello_world/build/bootloader/bootloader.bin /tools/blobs/
 RUN cp /tools/esp-idf/examples/get-started/hello_world/build/partition_table/partition-table.bin /tools/blobs/
 
+###############################################################################
+# Build image for tool required by Renesas builds
+###############################################################################
+FROM nuttx-toolchain-base AS nuttx-toolchain-renesas
+# Build Renesas RX GCC toolchain 
+RUN apt-get install -y -qq build-essential flex bison texinfo libncurses5-dev m4 make g++ wget
+
+# Download toolchain source code
+RUN mkdir -p /tools/renesas-tools/source/binutils && \
+  curl -s -L "https://gcc-renesas.com/downloads/d.php?f=rx/binutils/4.8.4.201803-gnurx/rx_binutils2.24_2018Q3.tar.gz" \
+  | tar -C renesas-tools/source/binutils --strip-components=1 -xz
+RUN mkdir -p /tools/renesas-tools/source/gcc && \
+  curl -s -L "https://gcc-renesas.com/downloads/d.php?f=rx/gcc/4.8.4.201803-gnurx/rx_gcc_4.8.4_2018Q3.tar.gz" \
+  | tar -C renesas-tools/source/gcc --strip-components=1 -xz
+RUN mkdir -p /tools/renesas-tools/source/newlib && \
+  curl -s -L "https://gcc-renesas.com/downloads/d.php?f=rx/newlib/4.8.4.201803-gnurx/rx_newlib2.2.0_2018Q3.tar.gz" \
+  | tar -C renesas-tools/source/newlib --strip-components=1 -xz
+
+# Install binutils
+RUN cd renesas-tools/source/binutils && \
+  chmod +x ./configure ./mkinstalldirs && \
+  mkdir -p /tools/renesas-tools/build/binutils && cd /tools/renesas-tools/build/binutils && \
+  /tools/renesas-tools/source/binutils/configure --target=rx-elf --prefix=/tools/renesas-toolchain/rx-elf-gcc --disable-werror &&\
+  make && make install 
+ENV PATH="/tools/renesas-toolchain/rx-elf-gcc/bin:$PATH"
+
+# Install gcc
+RUN cd renesas-tools/source/gcc && \
+  chmod +x ./contrib/download_prerequisites ./configure ./move-if-change ./libgcc/mkheader.sh && \
+  ./contrib/download_prerequisites && \
+  sed -i 's/@tex/\n&/g' ./gcc/doc/gcc.texi && sed -i 's/@end tex/\n&/g' ./gcc/doc/gcc.texi && \
+  mkdir -p /tools/renesas-tools/build/gcc && cd /tools/renesas-tools/build/gcc && \
+  /tools/renesas-tools/source/gcc/configure --target=rx-elf --prefix=/tools/renesas-toolchain/rx-elf-gcc \
+  --disable-shared --disable-multilib --disable-libssp --disable-libstdcxx-pch --disable-werror --enable-lto \
+  --enable-gold --with-pkgversion=GCC_Build_1.02 --with-newlib --enable-languages=c && \
+  make && make install 
+ENV PATH="/tools/renesas-toolchain/rx-elf-gcc/bin:$PATH"
+
+# Install newlib
+RUN cd renesas-tools/source/newlib && \
+  chmod +x ./configure && \
+  mkdir -p /tools/renesas-tools/build/newlib && cd /tools/renesas-tools/build/newlib && \
+  /tools/renesas-tools/source/newlib/configure --target=rx-elf --prefix=/tools/renesas-toolchain/rx-elf-gcc && \  
+  make && make install
+RUN cd /tools/renesas-tools/build/gcc && \
+  make && make install
+
 
 ###############################################################################
 # Final Docker image used for running CI system.  This includes all toolchains
@@ -205,5 +252,9 @@ ENV PATH="/tools/xtensa-esp32-elf-gcc/bin:$PATH"
 RUN mkdir -p /tools/blobs/esp32core
 COPY --from=nuttx-toolchain-esp32 /tools/blobs/* /tools/blobs/esp32core/
 RUN pip3 install esptool
+
+# Renesas toolchain
+COPY --from=nuttx-toolchain-renesas /tools/renesas-toolchain/rx-elf-gcc/ renesas-toolchain/rx-elf-gcc/
+ENV PATH="/tools/renesas-toolchain/rx-elf-gcc/bin:$PATH"
 
 CMD [ "/bin/bash" ]
