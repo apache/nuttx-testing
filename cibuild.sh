@@ -41,7 +41,7 @@ case $os in
     export HOMEBREW_CACHE=${prebuilt}/homebrew
     ;;
   Linux)
-    install="python-tools gen-romfs gperf kconfig-frontends bloaty arm-gcc-toolchain mips-gcc-toolchain riscv-gcc-toolchain xtensa-esp32-gcc-toolchain c-cache"
+    install="python-tools gen-romfs gperf kconfig-frontends bloaty arm-gcc-toolchain mips-gcc-toolchain riscv-gcc-toolchain xtensa-esp32-gcc-toolchain rx-gcc-toolchain c-cache"
     ;;
 esac
 
@@ -236,6 +236,54 @@ function avr-gcc-toolchain {
         ;;
     esac
   fi
+}
+
+function rx-gcc-toolchain {
+  add_path $prebuilt/renesas-toolchain/rx-elf-gcc/bin
+
+  if [ ! -f "$prebuilt/renesas-toolchain/rx-elf-gcc/bin/rx-elf-gcc" ]; then
+    case $os in
+      Linux)        
+        # Download toolchain source code
+        mkdir -p $prebuilt/renesas-tools/rx/source; cd $prebuilt/renesas-tools/rx/source
+        wget --quiet https://gcc-renesas.com/downloads/d.php?f=rx/binutils/4.8.4.201803-gnurx/rx_binutils2.24_2018Q3.tar.gz \
+          -O rx_binutils2.24_2018Q3.tar.gz
+        tar zxf rx_binutils2.24_2018Q3.tar.gz
+        wget --quiet https://gcc-renesas.com/downloads/d.php?f=rx/gcc/4.8.4.201803-gnurx/rx_gcc_4.8.4_2018Q3.tar.gz \
+          -O rx_gcc_4.8.4_2018Q3.tar.gz
+        tar zxf rx_gcc_4.8.4_2018Q3.tar.gz
+        wget --quiet https://gcc-renesas.com/downloads/d.php?f=rx/newlib/4.8.4.201803-gnurx/rx_newlib2.2.0_2018Q3.tar.gz \
+          -O rx_newlib2.2.0_2018Q3.tar.gz
+        tar zxf rx_newlib2.2.0_2018Q3.tar.gz
+
+        # Install binutils          
+        cd $prebuilt/renesas-tools/rx/source/binutils; chmod +x ./configure ./mkinstalldirs
+        mkdir -p $prebuilt/renesas-tools/rx/build/binutils; cd $prebuilt/renesas-tools/rx/build/binutils
+        $prebuilt/renesas-tools/rx/source/binutils/configure --target=rx-elf --prefix=$prebuilt/renesas-toolchain/rx-elf-gcc \
+          --disable-werror 
+        make; make install
+
+        # Install gcc          
+        cd $prebuilt/renesas-tools/rx/source/gcc 
+        chmod +x ./contrib/download_prerequisites ./configure ./move-if-change ./libgcc/mkheader.sh
+        ./contrib/download_prerequisites
+        sed -i 's/@tex/\n&/g' ./gcc/doc/gcc.texi && sed -i 's/@end tex/\n&/g' ./gcc/doc/gcc.texi
+        mkdir -p $prebuilt/renesas-tools/rx/build/gcc; cd $prebuilt/renesas-tools/rx/build/gcc
+        $prebuilt/renesas-tools/rx/source/gcc/configure --target=rx-elf --prefix=$prebuilt/renesas-toolchain/rx-elf-gcc \
+        --disable-shared --disable-multilib --disable-libssp --disable-libstdcxx-pch --disable-werror --enable-lto \
+        --enable-gold --with-pkgversion=GCC_Build_1.02 --with-newlib --enable-languages=c
+        make; make install
+
+        # Install newlib          
+        cd $prebuilt/renesas-tools/rx/source/newlib; chmod +x ./configure
+        mkdir -p $prebuilt/renesas-tools/rx/build/newlib; cd $prebuilt/renesas-tools/rx/build/newlib
+        $prebuilt/renesas-tools/rx/source/newlib/configure --target=rx-elf --prefix=$prebuilt/renesas-toolchain/rx-elf-gcc 
+        make; make install
+        rm -rf $prebuilt/renesas-tools/
+        ;;
+    esac
+  fi
+  rx-elf-gcc --version
 }
 
 function c-cache {
