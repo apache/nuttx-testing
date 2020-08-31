@@ -5,6 +5,7 @@
 # The recent versions of macOS is 64-bit only
 -sim:loadable
 -sim:module32
+-sim:sotest32
 
 # X11
 # macOS doesn't have X11
