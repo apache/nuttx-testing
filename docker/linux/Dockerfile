@@ -13,7 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-FROM ubuntu:19.10 AS builder-base
+FROM ubuntu:20.04 AS builder-base
 # NOTE WE ARE NOT REMOVEING APT CACHE.
 # This should only be used for temp build images that artifacts will be copied from
 RUN apt-get update -qq && apt-get install -y -qq \
@@ -25,7 +25,7 @@ RUN apt-get update -qq && apt-get install -y -qq \
 ###############################################################################
 FROM builder-base AS nuttx-tools
 
-RUN apt-get update -qq && apt-get install -y -qq \
+RUN apt-get update -qq && DEBIAN_FRONTEND="noninteractive" apt-get install -y -qq \
   flex \
   bison \
   gperf \
@@ -105,10 +105,25 @@ RUN mkdir xtensa-esp32-elf-gcc && \
   curl -s -L "https://dl.espressif.com/dl/xtensa-esp32-elf-gcc8_2_0-esp32-2019r1-rc2-linux-amd64.tar.xz" \
   | tar -C xtensa-esp32-elf-gcc --strip-components 1 -xJ
 
-RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends \
-  git bison gperf python python-pip python-setuptools make cmake ninja-build ccache libffi-dev libssl-dev libusb-1.0
+RUN apt-get update -qq && DEBIAN_FRONTEND="noninteractive" apt-get install -y -qq --no-install-recommends \
+  git \
+  bison \
+  gperf \
+  python3 \
+  python-is-python3 \
+  python3-pip \
+  python3-setuptools \
+  make \
+  cmake \
+  ninja-build \
+  ccache \
+  libffi-dev \
+  libssl-dev \
+  libusb-1.0
+
 RUN git clone --depth 1 --shallow-submodules --recursive https://github.com/espressif/esp-idf.git
 # This is unfortunatly going to re-download some of the same toolchains, but will only be used in the context of esp-idf
+RUN sed -i "s/^gdbgui.*/gdbgui==0.13.2.0/" esp-idf/requirements.txt
 RUN bash -c "\
   cd esp-idf && \
   ./install.sh"
@@ -133,8 +148,17 @@ RUN cp /tools/esp-idf/examples/get-started/hello_world/build/partition_table/par
 # Build image for tool required by Renesas builds
 ###############################################################################
 FROM nuttx-toolchain-base AS nuttx-toolchain-renesas
-# Build Renesas RX GCC toolchain 
-RUN apt-get install -y -qq build-essential flex bison texinfo libncurses5-dev m4 make g++ wget
+# Build Renesas RX GCC toolchain
+RUN apt-get update -qq && DEBIAN_FRONTEND="noninteractive" apt-get install -y -qq \
+  flex \
+  bison \
+  texinfo \
+  libncurses5-dev \
+  m4 \
+  make \
+  gcc \
+  g++ \
+  wget
 
 # Download toolchain source code
 RUN mkdir -p /tools/renesas-tools/source/binutils && \
@@ -159,6 +183,7 @@ ENV PATH="/tools/renesas-toolchain/rx-elf-gcc/bin:$PATH"
 RUN cd renesas-tools/source/gcc && \
   chmod +x ./contrib/download_prerequisites ./configure ./move-if-change ./libgcc/mkheader.sh && \
   ./contrib/download_prerequisites && \
+  sed -i '1s/^/@documentencoding ISO-8859-1\n/' ./gcc/doc/gcc.texi && \
   sed -i 's/@tex/\n&/g' ./gcc/doc/gcc.texi && sed -i 's/@end tex/\n&/g' ./gcc/doc/gcc.texi && \
   mkdir -p /tools/renesas-tools/build/gcc && cd /tools/renesas-tools/build/gcc && \
   /tools/renesas-tools/source/gcc/configure --target=rx-elf --prefix=/tools/renesas-toolchain/rx-elf-gcc \
@@ -181,12 +206,12 @@ RUN cd /tools/renesas-tools/build/gcc && \
 # Final Docker image used for running CI system.  This includes all toolchains
 # supported by the CI system.
 ###############################################################################
-FROM ubuntu:19.10
+FROM ubuntu:20.04
 LABEL maintainer="dev@nuttx.apache.org"
 
 RUN dpkg --add-architecture i386
 # This is used for the final images so make sure to not store apt cache
-RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends \
+RUN apt-get update -qq && DEBIAN_FRONTEND="noninteractive" apt-get install -y -qq --no-install-recommends \
   git \
   build-essential \
   gcc \
@@ -208,6 +233,7 @@ RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends \
   xxd \
   unzip \
   python3 \
+  python-is-python3 \
   python3-pip \
   ccache \
   && rm -rf /var/lib/apt/lists/*
