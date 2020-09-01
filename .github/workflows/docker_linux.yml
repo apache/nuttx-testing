@@ -35,12 +35,12 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOCKER_BUILDKIT: 1
-      IMAGE_TAG: docker.pkg.github.com/${{ github.repository }}/nuttx-ci-linux
+      IMAGE_TAG: ghcr.io/${{ github.repository }}/nuttx-ci-linux
     steps:
       - uses: actions/checkout@v2
 
       - name: Log into registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+        run: echo "${{ secrets.CR_PAT }}" | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
 
       - name: Build Linux image
         run: |
