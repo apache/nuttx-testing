@@ -209,6 +209,7 @@ RUN apt-get update -qq && apt-get install -y -qq --no-install-recommends \
   unzip \
   python3 \
   python3-pip \
+  ccache \
   && rm -rf /var/lib/apt/lists/*
 
 
@@ -256,5 +257,25 @@ RUN pip3 install esptool
 # Renesas toolchain
 COPY --from=nuttx-toolchain-renesas /tools/renesas-toolchain/rx-elf-gcc/ renesas-toolchain/rx-elf-gcc/
 ENV PATH="/tools/renesas-toolchain/rx-elf-gcc/bin:$PATH"
+
+# Configure ccache
+RUN mkdir -p /tools/ccache/bin && \
+  ln -sf `which ccache` /tools/ccache/bin/cc && \
+  ln -sf `which ccache` /tools/ccache/bin/c++ && \
+  ln -sf `which ccache` /tools/ccache/bin/clang && \
+  ln -sf `which ccache` /tools/ccache/bin/clang++ && \
+  ln -sf `which ccache` /tools/ccache/bin/gcc && \
+  ln -sf `which ccache` /tools/ccache/bin/g++ && \
+  ln -sf `which ccache` /tools/ccache/bin/arm-none-eabi-gcc && \
+  ln -sf `which ccache` /tools/ccache/bin/arm-none-eabi-g++ && \
+  ln -sf `which ccache` /tools/ccache/bin/p32-gcc && \
+  ln -sf `which ccache` /tools/ccache/bin/riscv64-unknown-elf-gcc && \
+  ln -sf `which ccache` /tools/ccache/bin/riscv64-unknown-elf-g++ && \
+  ln -sf `which ccache` /tools/ccache/bin/xtensa-esp32-elf-gcc && \
+  ln -sf `which ccache` /tools/ccache/bin/xtensa-esp32-elf-g++ && \
+  ln -sf `which ccache` /tools/ccache/bin/avr-gcc && \
+  ln -sf `which ccache` /tools/ccache/bin/avr-g++ && \
+  ln -sf `which ccache` /tools/ccache/bin/rx-elf-gcc
+ENV PATH="/tools/ccache/bin:$PATH"
 
 CMD [ "/bin/bash" ]

@@ -20,6 +20,7 @@ jobs:
     runs-on: ubuntu-18.04
     env:
       DOCKER_BUILDKIT: 1
+      IMAGE_TAG: docker.pkg.github.com/${{ github.repository }}/nuttx-ci-linux
 
     strategy:
       matrix:
@@ -63,16 +64,27 @@ jobs:
         timeout_minutes: 10
         max_attempts: 3
         retry_wait_seconds: 10
-        command: docker pull docker.pkg.github.com/apache/incubator-nuttx-testing/nuttx-ci-linux
+        command: docker pull $IMAGE_TAG
 
+    - name: Restore ccache
+      id: ccache
+      uses: actions/cache@v2
+      with:
+        path: ccache
+        key: ccache-${{ runner.os }}-${{matrix.boards}}-${{ github.run_id }}
+        restore-keys: ccache-${{ runner.os }}-${{matrix.boards}}-
     - name: Run builds
       uses: ./testing/.github/actions/ci-container
       env:
         BLOBDIR: /tools/blobs
       with:
         run: |
+          export CCACHE_DIR=`pwd`/ccache
           cd testing
-          ./cibuild.sh -x testlist/${{matrix.boards}}.dat
+          ./cibuild.sh -c -x testlist/${{matrix.boards}}.dat
+          ccache -s
+          ccache -M 400M
+          ccache -c
 
   macOS:
     runs-on: macos-10.15
@@ -107,16 +119,28 @@ jobs:
         repository: apache/incubator-nuttx-testing
         path: testing
 
-    - name: Restore cache
+    - name: Restore tools cache
       id: cache-tools
-      uses: actions/cache@v1
+      uses: actions/cache@v2
       env:
         cache-name: ${{ runner.os }}-cache-tools
       with:
         path: prebuilt
         key: ${{ runner.os }}-tools-${{ hashFiles('./testing/cibuild.sh') }}
 
+    - name: Restore ccache
+      id: ccache
+      uses: actions/cache@v2
+      with:
+        path: ccache
+        key: ccache-${{ runner.os }}-${{matrix.boards}}-${{ github.run_id }}
+        restore-keys: ccache-${{ runner.os }}-${{matrix.boards}}-
     - name: Run builds
       run: |
+        export CCACHE_DIR=`pwd`/ccache
         cd testing
-        ./cibuild.sh -i -x testlist/${{matrix.boards}}.dat
+        ./cibuild.sh -i -c -x testlist/${{matrix.boards}}.dat
+        ccache -s
+        ccache -M 400M
+        ccache -c
+

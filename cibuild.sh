@@ -24,6 +24,7 @@
 #  - wget
 
 set -e
+set -o xtrace
 
 WD=$(cd $(dirname $0) && pwd)
 WORKSPACE=$(cd $WD/.. && pwd -P)
@@ -36,12 +37,12 @@ EXTRA_PATH=
 
 case $os in
   Darwin)
-    install="python-tools u-boot-tools discoteq-flock elf-toolchain gen-romfs kconfig-frontends bloaty arm-gcc-toolchain riscv-gcc-toolchain xtensa-esp32-gcc-toolchain avr-gcc-toolchain"
+    install="python-tools u-boot-tools discoteq-flock elf-toolchain gen-romfs kconfig-frontends arm-gcc-toolchain riscv-gcc-toolchain xtensa-esp32-gcc-toolchain avr-gcc-toolchain c-cache"
     mkdir -p ${prebuilt}/homebrew
     export HOMEBREW_CACHE=${prebuilt}/homebrew
     ;;
   Linux)
-    install="python-tools gen-romfs gperf kconfig-frontends bloaty arm-gcc-toolchain mips-gcc-toolchain riscv-gcc-toolchain xtensa-esp32-gcc-toolchain rx-gcc-toolchain c-cache"
+    install="python-tools gen-romfs gperf kconfig-frontends arm-gcc-toolchain mips-gcc-toolchain riscv-gcc-toolchain xtensa-esp32-gcc-toolchain rx-gcc-toolchain c-cache"
     ;;
 esac
 
@@ -289,21 +290,39 @@ function rx-gcc-toolchain {
 function c-cache {
   add_path $prebuilt/ccache/bin
 
-  if [ ! -f "$prebuilt/ccache/bin/ccache" ]; then
-    cd $prebuilt;
-    wget --quiet https://github.com/ccache/ccache/releases/download/v3.7.7/ccache-3.7.7.tar.gz
-    tar zxf ccache-3.7.7.tar.gz
-    cd ccache-3.7.7; ./configure --prefix=$prebuilt/ccache; make; make install
-    cd $prebuilt; rm -rf ccache-3.7.7; rm ccache-3.7.7.tar.gz
-    ln -sf $prebuilt/ccache/bin/ccache $prebuilt/ccache/bin/gcc
-    ln -sf $prebuilt/ccache/bin/ccache $prebuilt/ccache/bin/g++
-    ln -sf $prebuilt/ccache/bin/ccache $prebuilt/ccache/bin/arm-none-eabi-gcc
-    ln -sf $prebuilt/ccache/bin/ccache $prebuilt/ccache/bin/arm-none-eabi-g++
-    ln -sf $prebuilt/ccache/bin/ccache $prebuilt/ccache/bin/p32-gcc
-    ln -sf $prebuilt/ccache/bin/ccache $prebuilt/ccache/bin/riscv64-unknown-elf-gcc
-    ln -sf $prebuilt/ccache/bin/ccache $prebuilt/ccache/bin/riscv64-unknown-elf-g++
+  if ! type ccache > /dev/null; then
+    case $os in
+      Darwin)
+        brew install ccache
+        ;;
+      Linux)
+        cd $prebuilt;
+        wget https://github.com/ccache/ccache/releases/download/v3.7.7/ccache-3.7.7.tar.gz
+        tar zxf ccache-3.7.7.tar.gz
+        cd ccache-3.7.7; ./configure --prefix=$prebuilt/ccache; make; make install
+        cd $prebuilt; rm -rf ccache-3.7.7; rm ccache-3.7.7.tar.gz
+        ;;
+    esac
   fi
+
   ccache --version
+  mkdir -p $prebuilt/ccache/bin/
+  ln -sf `which ccache` $prebuilt/ccache/bin/x86_64-elf-gcc
+  ln -sf `which ccache` $prebuilt/ccache/bin/x86_64-elf-g++
+  ln -sf `which ccache` $prebuilt/ccache/bin/cc
+  ln -sf `which ccache` $prebuilt/ccache/bin/c++
+  ln -sf `which ccache` $prebuilt/ccache/bin/clang
+  ln -sf `which ccache` $prebuilt/ccache/bin/clang++
+  ln -sf `which ccache` $prebuilt/ccache/bin/gcc
+  ln -sf `which ccache` $prebuilt/ccache/bin/g++
+  ln -sf `which ccache` $prebuilt/ccache/bin/arm-none-eabi-gcc
+  ln -sf `which ccache` $prebuilt/ccache/bin/arm-none-eabi-g++
+  ln -sf `which ccache` $prebuilt/ccache/bin/p32-gcc
+  ln -sf `which ccache` $prebuilt/ccache/bin/riscv64-unknown-elf-gcc
+  ln -sf `which ccache` $prebuilt/ccache/bin/riscv64-unknown-elf-g++
+  ln -sf `which ccache` $prebuilt/ccache/bin/xtensa-esp32-elf-gcc
+  ln -sf `which ccache` $prebuilt/ccache/bin/avr-gcc
+  ln -sf `which ccache` $prebuilt/ccache/bin/avr-g++
 }
 
 function usage {
@@ -324,8 +343,7 @@ function usage {
 
 function enable_ccache {
   export USE_CCACHE=1;
-  export CCACHE_DIR=$prebuilt/ccache/.ccache;
-  ccache -c
+  ccache -z
   ccache -M 5G;
   ccache -s
 }
