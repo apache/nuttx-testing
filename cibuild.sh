@@ -383,7 +383,7 @@ function run_builds {
 
   case $os in
     Darwin)
-      ncpus=$(sysctl -n machdep.cpu.thread_count)
+      ncpus=$(sysctl -n hw.ncpu)
       ;;
     Linux)
       ncpus=`grep -c ^processor /proc/cpuinfo`
