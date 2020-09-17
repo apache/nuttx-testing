@@ -326,12 +326,14 @@ function c-cache {
 }
 
 function binutils {
-  add_path /usr/local/binutils/bin/
+  mkdir -p $prebuilt/bintools/bin
+  add_path $prebuilt/bintools/bin
 
   if ! type objcopy > /dev/null; then
     case $os in
       Darwin)
         brew install binutils
+        ln -s /usr/local/opt/binutils/bin/objcopy $prebuilt/bintools/bin/objcopy
         ;;
     esac
   fi
