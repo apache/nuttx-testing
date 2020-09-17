@@ -37,7 +37,7 @@ EXTRA_PATH=
 
 case $os in
   Darwin)
-    install="python-tools u-boot-tools discoteq-flock elf-toolchain gen-romfs kconfig-frontends arm-gcc-toolchain riscv-gcc-toolchain xtensa-esp32-gcc-toolchain avr-gcc-toolchain c-cache"
+    install="python-tools u-boot-tools discoteq-flock elf-toolchain gen-romfs kconfig-frontends arm-gcc-toolchain riscv-gcc-toolchain xtensa-esp32-gcc-toolchain avr-gcc-toolchain c-cache binutils"
     mkdir -p ${prebuilt}/homebrew
     export HOMEBREW_CACHE=${prebuilt}/homebrew
     ;;
@@ -323,6 +323,18 @@ function c-cache {
   ln -sf `which ccache` $prebuilt/ccache/bin/xtensa-esp32-elf-gcc
   ln -sf `which ccache` $prebuilt/ccache/bin/avr-gcc
   ln -sf `which ccache` $prebuilt/ccache/bin/avr-g++
+}
+
+function binutils {
+  add_path /usr/local/binutils/bin/
+
+  if ! type objcopy > /dev/null; then
+    case $os in
+      Darwin)
+        brew install binutils
+        ;;
+    esac
+  fi
 }
 
 function usage {
