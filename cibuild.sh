@@ -37,7 +37,7 @@ EXTRA_PATH=
 
 case $os in
   Darwin)
-    install="python-tools u-boot-tools discoteq-flock elf-toolchain gen-romfs kconfig-frontends arm-gcc-toolchain riscv-gcc-toolchain xtensa-esp32-gcc-toolchain avr-gcc-toolchain c-cache binutils"
+    install="python-tools u-boot-tools elf-toolchain gen-romfs kconfig-frontends arm-gcc-toolchain riscv-gcc-toolchain xtensa-esp32-gcc-toolchain avr-gcc-toolchain c-cache binutils"
     mkdir -p ${prebuilt}/homebrew
     export HOMEBREW_CACHE=${prebuilt}/homebrew
     ;;
@@ -65,17 +65,6 @@ function u-boot-tools {
     case $os in
       Darwin)
         brew install u-boot-tools
-        ;;
-    esac
-  fi
-}
-
-function discoteq-flock {
-  if ! type flock > /dev/null; then
-    case $os in
-      Darwin)
-        brew tap discoteq/discoteq
-        brew install flock
         ;;
     esac
   fi
