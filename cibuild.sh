@@ -32,8 +32,17 @@ nuttx=$WORKSPACE/nuttx
 apps=$WORKSPACE/apps
 tools=$WORKSPACE/tools
 prebuilt=$WORKSPACE/prebuilt
-os=$(uname -s)
 EXTRA_PATH=
+
+
+kernel="$(uname -s)"
+case $kernel in
+  Linux*)   os=Linux;;
+  Darwin*)  os=Darwin;;
+  CYGWIN*)  os=Cygwin;;
+  MINGW*)   os=MinGw;;
+  *)        os="UNKNOWN:$kernel"
+esac
 
 case $os in
   Darwin)
@@ -43,6 +52,9 @@ case $os in
     ;;
   Linux)
     install="python-tools gen-romfs gperf kconfig-frontends arm-gcc-toolchain mips-gcc-toolchain riscv-gcc-toolchain xtensa-esp32-gcc-toolchain rx-gcc-toolchain c-cache"
+    ;;
+  Cygwin)
+    install="gen-romfs kconfig-frontends arm-gcc-toolchain"
     ;;
 esac
 
@@ -115,6 +127,9 @@ function kconfig-frontends {
   add_path $prebuilt/kconfig-frontends/bin
 
   if [ ! -f "$prebuilt/kconfig-frontends/bin/kconfig-conf" ]; then
+    if [ ! -d "$tools" ]; then
+      git clone https://bitbucket.org/nuttx/tools.git $tools
+    fi
     cd $tools/kconfig-frontends
     ./configure --prefix=$prebuilt/kconfig-frontends \
       --disable-kconfig --disable-nconf --disable-qconf \
@@ -142,22 +157,33 @@ function bloaty {
 
 function arm-gcc-toolchain {
   add_path $prebuilt/gcc-arm-none-eabi/bin
+  urlbase="https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/"
+  releasebase="gcc-arm-none-eabi-9-2019-q4-major"
 
   if [ ! -f "$prebuilt/gcc-arm-none-eabi/bin/arm-none-eabi-gcc" ]; then
-    local flavor
+    cd $prebuilt
+    local filename
     case $os in
       Darwin)
-        flavor=mac
-        ;;
+        filename="$releasebase-mac.tar.bz2"
+        wget --quiet $urlbase/$filename
+        tar jxf $filename
+        mv $releasebase gcc-arm-none-eabi
+	;;
       Linux)
-        flavor=x86_64-linux
+        filename="$releasebase-x86_64.tar.bz2"
+        wget --quiet $urlbase/$filename
+        tar jxf $filename
+        mv $releasebase gcc-arm-none-eabi
+        ;;
+      Cygwin)
+        filename="$releasebase-win32.zip"
+        wget --quiet $urlbase/$filename
+	mkdir -p gcc-arm-none-eabi
+        unzip -qq $filename -d ./gcc-arm-none-eabi
         ;;
     esac
-    cd $prebuilt
-    wget --quiet https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/RC2.1/gcc-arm-none-eabi-9-2019-q4-major-${flavor}.tar.bz2
-    tar jxf gcc-arm-none-eabi-9-2019-q4-major-${flavor}.tar.bz2
-    mv gcc-arm-none-eabi-9-2019-q4-major gcc-arm-none-eabi
-    rm gcc-arm-none-eabi-9-2019-q4-major-${flavor}.tar.bz2
+    rm $filename
   fi
   arm-none-eabi-gcc --version
 }
@@ -389,6 +415,9 @@ function run_builds {
       ncpus=$(sysctl -n hw.ncpu)
       ;;
     Linux)
+      ncpus=`grep -c ^processor /proc/cpuinfo`
+      ;;
+    Cygwin)
       ncpus=`grep -c ^processor /proc/cpuinfo`
       ;;
   esac
