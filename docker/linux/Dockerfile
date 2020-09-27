@@ -113,6 +113,7 @@ RUN apt-get update -qq && DEBIAN_FRONTEND="noninteractive" apt-get install -y -q
   python-is-python3 \
   python3-pip \
   python3-setuptools \
+  python3-pexpect \
   make \
   cmake \
   ninja-build \
