@@ -58,6 +58,7 @@ function python-tools {
   PYTHONUSERBASE=$prebuilt/pylocal
   export PYTHONUSERBASE
   add_path $PYTHONUSERBASE/bin
+  pip3 install pexpect
 }
 
 function u-boot-tools {
