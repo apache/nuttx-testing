@@ -197,10 +197,11 @@ jobs:
       run: |
         cyg-get make gcc-core gcc-g++ flex git bison byacc gperf gdb unzip awk `
                 automake-1.15 autoconf wget xxd libmpc-devel libncurses-devel `
-                libmpfr-devel zlib-devel
+                libmpfr-devel zlib-devel patch
     - name: Set Cygwin PATH env
       run: |
         echo '::set-env name=PATH::C:\tools\cygwin\bin;C:\tools\cygwin\usr\bin'
+        echo "::add-matcher::nuttx/.github/gcc.json"
     - name: Run builds
       shell: cmd
       run: |
