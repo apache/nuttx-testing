@@ -144,3 +144,65 @@ jobs:
         ccache -M 400M
         ccache -c
 
+  cygwin:
+    runs-on: windows-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        boards: [arm-12-win, sim]
+
+    steps:
+    - run: git config --global core.autocrlf false
+    - name: Checkout nuttx repo
+      uses: actions/checkout@v2
+      with:
+        repository: apache/incubator-nuttx
+        path: nuttx
+        fetch-depth: 0
+
+    - name: Fetch nuttx tags
+      run: |
+        cd nuttx
+        git fetch --tags
+
+    - name: Checkout apps repo
+      uses: actions/checkout@v2
+      with:
+        repository: apache/incubator-nuttx-apps
+        path: apps
+        fetch-depth: 0
+
+    - name: Checkout testing repo
+      uses: actions/checkout@v2
+      with:
+        repository: apache/incubator-nuttx-testing
+        path: testing
+
+    - name: Restore tools cache
+      id: cache-tools
+      uses: actions/cache@v2
+      env:
+        cache-name: ${{ runner.os }}-cache-tools
+      with:
+        path: prebuilt
+        key: ${{ runner.os }}-tools-${{ hashFiles('./testing/cibuild.sh') }}
+
+    - name: Install cygwin base packages with chocolatey
+      shell: pwsh
+      run: |
+        choco install --no-progress cygwin --version 3.1.4
+        choco install cyg-get
+    - name: Install Build Requirements for Cygwin
+      run: |
+        cyg-get make gcc-core gcc-g++ flex git bison byacc gperf gdb unzip awk `
+                automake-1.15 autoconf wget xxd libmpc-devel libncurses-devel `
+                libmpfr-devel zlib-devel patch
+    - name: Set Cygwin PATH env
+      run: |
+        echo '::set-env name=PATH::C:\tools\cygwin\bin;C:\tools\cygwin\usr\bin'
+        echo "::add-matcher::nuttx/.github/gcc.json"
+    - name: Run builds
+      shell: cmd
+      run: |
+        C:\tools\cygwin\bin\bash.exe --noprofile --norc -e -o pipefail -c "cd testing &&./cibuild.sh -i testlist/${{matrix.boards}}.dat"
