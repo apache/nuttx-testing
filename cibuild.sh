@@ -322,6 +322,9 @@ function binutils {
     case $os in
       Darwin)
         brew install binutils
+        # It is possible we cached prebuilt but did brew install so recreate
+        # simlink if it exists
+        rm -f $prebuilt/bintools/bin/objcopy
         ln -s /usr/local/opt/binutils/bin/objcopy $prebuilt/bintools/bin/objcopy
         ;;
     esac
