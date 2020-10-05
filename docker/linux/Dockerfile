@@ -103,7 +103,7 @@ FROM nuttx-toolchain-base AS nuttx-toolchain-esp32
 # Download the latest ESP32 GCC toolchain prebuilt by Espressif
 RUN mkdir xtensa-esp32-elf-gcc && \
   curl -s -L "https://github.com/espressif/crosstool-NG/releases/download/esp-2020r3/xtensa-esp32-elf-gcc8_4_0-esp-2020r3-linux-amd64.tar.gz" \
-  | tar -C xtensa-esp32-elf-gcc --strip-components 1 -xJ
+  | tar -C xtensa-esp32-elf-gcc --strip-components 1 -xz
 
 RUN apt-get update -qq && DEBIAN_FRONTEND="noninteractive" apt-get install -y -qq --no-install-recommends \
   git \
