@@ -1,0 +1,17 @@
+#### sim ####
+-sim:cxxtest
+
+# CONFIG_SIM_M32=y
+# The recent versions of macOS is 64-bit only
+-sim:loadable
+-sim:module32
+-sim:sotest32
+
+# X11
+# macOS doesn't have X11
+-sim:nsh2
+-sim:nx11
+-sim:nxlines
+-sim:nxwm
+-sim:touchscreen
+

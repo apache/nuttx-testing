@@ -393,16 +393,20 @@ function run_builds {
   case $os in
     Darwin)
       ncpus=$(sysctl -n hw.ncpu)
+      ostweak=$WD/testlist/macos-tweak.dat
       ;;
     Linux)
       ncpus=`grep -c ^processor /proc/cpuinfo`
+      ostweak=$WD/testlist/linux-tweak.dat
       ;;
   esac
 
   options+="-j $ncpus"
 
   for build in $builds; do
-    $nuttx/tools/testbuild.sh $options -e "-Wno-cpp -Werror" $build
+    tweakedbuild=$(mktemp /tmp/nuttx-testlist.XXXXXX)
+    cat $build $ostweak > $tweakedbuild
+    $nuttx/tools/testbuild.sh $options -e "-Wno-cpp -Werror" $tweakedbuild
   done
 }
 

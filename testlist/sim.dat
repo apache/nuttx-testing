@@ -1,11 +1,6 @@
 /sim
+# This target is actually broken (https://github.com/apache/incubator-nuttx/issues/2086)
 -sim:cxxtest
-
-# CONFIG_SIM_M32=y
-# The recent versions of macOS is 64-bit only
--sim:loadable
--sim:module32
--sim:sotest32
 
 # X11
 # macOS doesn't have X11
