@@ -16,3 +16,4 @@
 -Darwin,sim:nxlines
 -Darwin,sim:nxwm
 -Darwin,sim:touchscreen
+-Darwin,sim:lvgl
