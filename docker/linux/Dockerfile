@@ -213,30 +213,30 @@ LABEL maintainer="dev@nuttx.apache.org"
 RUN dpkg --add-architecture i386
 # This is used for the final images so make sure to not store apt cache
 RUN apt-get update -qq && DEBIAN_FRONTEND="noninteractive" apt-get install -y -qq --no-install-recommends \
-  git \
-  build-essential \
-  gcc \
-  gcc-multilib \
-  gcc-avr \
   avr-libc \
-  wget \
-  libx11-dev \
-  libxext-dev \
-  u-boot-tools \
+  build-essential \
+  ccache \
+  curl \
+  gcc \
+  gcc-avr \
+  gcc-multilib \
+  gettext \
+  git \
   lib32z1-dev \
   libc6-dev-i386 \
-  libx11-dev:i386 \
-  libxext-dev:i386 \
-  linux-libc-dev:i386 \
-  curl \
-  gettext \
+  libasound2-dev libasound2-dev:i386 \
   libcurl4-openssl-dev \
-  xxd \
-  unzip \
+  libpulse-dev libpulse-dev:i386 \
+  libx11-dev libx11-dev:i386 \
+  libxext-dev libxext-dev:i386 \
+  linux-libc-dev:i386 \
   python3 \
-  python-is-python3 \
   python3-pip \
-  ccache \
+  python-is-python3 \
+  u-boot-tools \
+  unzip \
+  wget \
+  xxd \
   && rm -rf /var/lib/apt/lists/*
 
 
