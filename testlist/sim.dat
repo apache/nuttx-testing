@@ -17,3 +17,6 @@
 -Darwin,sim:nxwm
 -Darwin,sim:touchscreen
 -Darwin,sim:lvgl
+
+# macOS doesn't have ALSA
+-Darwin,sim:alsa
