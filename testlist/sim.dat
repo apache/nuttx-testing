@@ -20,3 +20,7 @@
 
 # macOS doesn't have ALSA
 -Darwin,sim:alsa
+
+# Do not build Linux configs
+-Darwin,sim:linux.*
+
