@@ -1,5 +1,5 @@
 /sim
--sim:cxxtest
+-Darwin,sim:cxxtest
 
 # CONFIG_SIM_M32=y
 # The recent versions of macOS is 64-bit only
