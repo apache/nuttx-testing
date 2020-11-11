@@ -23,7 +23,6 @@
 -nr5m100-nexys4:nsh
 
 /sim
--sim:cxxtest
 
 /x86
 
