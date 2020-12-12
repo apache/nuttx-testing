@@ -123,7 +123,7 @@ RUN apt-get update -qq && DEBIAN_FRONTEND="noninteractive" apt-get install -y -q
   libusb-1.0
 
 RUN git clone --depth 1 --shallow-submodules --recursive https://github.com/espressif/esp-idf.git
-# This is unfortunatly going to re-download some of the same toolchains, but will only be used in the context of esp-idf
+# This is unfortunately going to re-download some of the same toolchains, but will only be used in the context of esp-idf
 RUN sed -i "s/^gdbgui.*/gdbgui==0.13.2.0/" esp-idf/requirements.txt
 RUN bash -c "\
   cd esp-idf && \
