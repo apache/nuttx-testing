@@ -33,6 +33,7 @@ RUN apt-get update -qq && DEBIAN_FRONTEND="noninteractive" apt-get install -y -q
   make \
   cmake \
   g++ \
+  gawk \
   git
 
 RUN mkdir /tools
