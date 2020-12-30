@@ -17,7 +17,7 @@ on:
 
 jobs:
   Linux:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     env:
       DOCKER_BUILDKIT: 1
       IMAGE_TAG: docker.pkg.github.com/${{ github.repository }}/nuttx-ci-linux
@@ -25,122 +25,92 @@ jobs:
     strategy:
       matrix:
         boards: [arm-01, arm-02, arm-03, arm-04, arm-05, arm-06, arm-07, arm-08, arm-09, arm-10, arm-11, arm-12, arm-13, other, sim]
+
     steps:
-    - name: Checkout nuttx repo
-      uses: actions/checkout@v2
-      with:
-        repository: apache/incubator-nuttx
-        path: nuttx
-        fetch-depth: 0
+      - name: Checkout nuttx repo
+        uses: actions/checkout@v2
+        with:
+          repository: apache/incubator-nuttx
+          ref: master
+          path: sources/nuttx
+          fetch-depth: 1
+      - name: Checkout nuttx repo tags
+        run: git -C sources/nuttx fetch --tags
 
-    - name: Fetch nuttx tags
-      run: |
-        cd nuttx
-        git fetch --tags
+      - name: Checkout apps repo
+        uses: actions/checkout@v2
+        with:
+          repository: apache/incubator-nuttx-apps
+          ref: master
+          path: sources/apps
+          fetch-depth: 1
 
-    - name: Checkout apps repo
-      uses: actions/checkout@v2
-      with:
-        repository: apache/incubator-nuttx-apps
-        path: apps
-        fetch-depth: 0
+      - name: Checkout testing repo
+        uses: actions/checkout@v2
+        with:
+          repository: apache/incubator-nuttx-testing
+          path: sources/testing
+          fetch-depth: 1
 
-    - name: Checkout testing repo
-      uses: actions/checkout@v2
-      with:
-        repository: apache/incubator-nuttx-testing
-        path: testing
+      - name: Docker Login
+        uses: azure/docker-login@v1
+        with:
+          login-server: docker.pkg.github.com
+          username: ${GITHUB_ACTOR}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Docker Login
-      uses: azure/docker-login@v1
-      with:
-        login-server: docker.pkg.github.com
-        username: ${GITHUB_ACTOR}
-        password: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Docker Pull
-      uses: nick-invision/retry@v1
-      with:
-        timeout_minutes: 10
-        max_attempts: 3
-        retry_wait_seconds: 10
-        command: docker pull $IMAGE_TAG
-
-    - name: Restore ccache
-      id: ccache
-      uses: actions/cache@v2
-      with:
-        path: ccache
-        key: ccache-${{ runner.os }}-${{matrix.boards}}-${{ github.run_id }}
-        restore-keys: ccache-${{ runner.os }}-${{matrix.boards}}-
-    - name: Run builds
-      uses: ./testing/.github/actions/ci-container
-      env:
-        BLOBDIR: /tools/blobs
-      with:
-        run: |
-          export CCACHE_DIR=`pwd`/ccache
-          cd testing
-          ./cibuild.sh -c -x testlist/${{matrix.boards}}.dat
-          ccache -s
-          ccache -M 400M
-          ccache -c
+      - name: Docker Pull
+        run: docker pull docker.pkg.github.com/apache/incubator-nuttx-testing/nuttx-ci-linux
+      - name: Run builds
+        uses: ./sources/testing/.github/actions/ci-container
+        env:
+          BLOBDIR: /tools/blobs
+        with:
+          run: |
+            echo "::add-matcher::sources/nuttx/.github/gcc.json"
+            export CCACHE_DIR=`pwd`/ccache
+            mkdir $CCACHE_DIR
+            cd sources/testing
+            export ARTIFACTDIR=`pwd`/../../buildartifacts
+            ./cibuild.sh -A -c testlist/${{matrix.boards}}.dat
+            ccache -s
 
   macOS:
     runs-on: macos-10.15
-
     strategy:
       matrix:
         boards: [arm-12, other, sim]
-
     steps:
-    - name: Checkout nuttx repo
-      uses: actions/checkout@v2
-      with:
-        repository: apache/incubator-nuttx
-        path: nuttx
-        fetch-depth: 0
+      - name: Checkout nuttx repo
+        uses: actions/checkout@v2
+        with:
+          repository: apache/incubator-nuttx
+          ref: master
+          path: sources/nuttx
+          fetch-depth: 1
+      - name: Checkout nuttx repo tags
+        run: git -C sources/nuttx fetch --tags
 
-    - name: Fetch nuttx tags
-      run: |
-        cd nuttx
-        git fetch --tags
+      - name: Checkout apps repo
+        uses: actions/checkout@v2
+        with:
+          repository: apache/incubator-nuttx-apps
+          ref: master
+          path: sources/apps
+          fetch-depth: 1
 
-    - name: Checkout apps repo
-      uses: actions/checkout@v2
-      with:
-        repository: apache/incubator-nuttx-apps
-        path: apps
-        fetch-depth: 0
-
-    - name: Checkout testing repo
-      uses: actions/checkout@v2
-      with:
-        repository: apache/incubator-nuttx-testing
-        path: testing
-
-    - name: Restore tools cache
-      id: cache-tools
-      uses: actions/cache@v2
-      env:
-        cache-name: ${{ runner.os }}-cache-tools
-      with:
-        path: prebuilt
-        key: ${{ runner.os }}-tools-${{ hashFiles('./testing/cibuild.sh') }}
-
-    - name: Restore ccache
-      id: ccache
-      uses: actions/cache@v2
-      with:
-        path: ccache
-        key: ccache-${{ runner.os }}-${{matrix.boards}}-${{ github.run_id }}
-        restore-keys: ccache-${{ runner.os }}-${{matrix.boards}}-
-    - name: Run builds
-      run: |
-        export CCACHE_DIR=`pwd`/ccache
-        cd testing
-        ./cibuild.sh -i -c -x testlist/${{matrix.boards}}.dat
-        ccache -s
-        ccache -M 400M
-        ccache -c
-
+      - name: Checkout testing repo
+        uses: actions/checkout@v2
+        with:
+          repository: apache/incubator-nuttx-testing
+          path: sources/testing
+          fetch-depth: 1
+      - name: Run Builds
+        run: |
+          echo "::add-matcher::sources/nuttx/.github/gcc.json"
+          export CCACHE_DIR=`pwd`/ccache
+          mkdir $CCACHE_DIR
+          cd sources/testing
+          export ARTIFACTDIR=`pwd`/../../buildartifacts
+          ./cibuild.sh -i -A -c -x testlist/${{matrix.boards}}.dat
+          ccache -s
