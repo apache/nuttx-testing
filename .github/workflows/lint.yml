@@ -1,0 +1,14 @@
+name: Lint
+
+on: [pull_request]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Super Lint
+        uses: github/super-linter@v3
+        env:
+          VALIDATE_YAML: true
