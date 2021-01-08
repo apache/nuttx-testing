@@ -106,6 +106,7 @@ RUN mkdir xtensa-esp32-elf-gcc && \
   curl -s -L "https://github.com/espressif/crosstool-NG/releases/download/esp-2020r3/xtensa-esp32-elf-gcc8_4_0-esp-2020r3-linux-amd64.tar.gz" \
   | tar -C xtensa-esp32-elf-gcc --strip-components 1 -xz
 
+# Note: xtensa-esp32-elf-gdb is linked to libpython2.7
 RUN apt-get update -qq && DEBIAN_FRONTEND="noninteractive" apt-get install -y -qq --no-install-recommends \
   git \
   bison \
@@ -121,7 +122,8 @@ RUN apt-get update -qq && DEBIAN_FRONTEND="noninteractive" apt-get install -y -q
   ccache \
   libffi-dev \
   libssl-dev \
-  libusb-1.0
+  libusb-1.0 \
+  libpython2.7
 
 RUN git clone --depth 1 --shallow-submodules --recursive https://github.com/espressif/esp-idf.git
 # This is unfortunately going to re-download some of the same toolchains, but will only be used in the context of esp-idf
