@@ -17,6 +17,7 @@ on:
 
 jobs:
   Linux:
+    if: false
     runs-on: ubuntu-latest
     env:
       DOCKER_BUILDKIT: 1
@@ -79,7 +80,7 @@ jobs:
     runs-on: macos-10.15
     strategy:
       matrix:
-        boards: [arm-12, other, sim]
+        boards: [other]
     steps:
       - name: Checkout nuttx repo
         uses: actions/checkout@v2
