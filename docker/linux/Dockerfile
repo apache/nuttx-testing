@@ -213,6 +213,7 @@ LABEL maintainer="dev@nuttx.apache.org"
 
 RUN dpkg --add-architecture i386
 # This is used for the final images so make sure to not store apt cache
+# Note: xtensa-esp32-elf-gdb is linked to libpython2.7
 RUN apt-get update -qq && DEBIAN_FRONTEND="noninteractive" apt-get install -y -qq --no-install-recommends \
   -o APT::Immediate-Configure=0 \
   avr-libc \
@@ -229,6 +230,7 @@ RUN apt-get update -qq && DEBIAN_FRONTEND="noninteractive" apt-get install -y -q
   libasound2-dev libasound2-dev:i386 \
   libcurl4-openssl-dev \
   libpulse-dev libpulse-dev:i386 \
+  libpython2.7 \
   libx11-dev libx11-dev:i386 \
   libxext-dev libxext-dev:i386 \
   linux-libc-dev:i386 \
