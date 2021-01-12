@@ -216,6 +216,7 @@ LABEL maintainer="dev@nuttx.apache.org"
 RUN dpkg --add-architecture i386
 # This is used for the final images so make sure to not store apt cache
 RUN apt-get update -qq && DEBIAN_FRONTEND="noninteractive" apt-get install -y -qq --no-install-recommends \
+  -o APT::Immediate-Configure=0 \
   avr-libc \
   build-essential \
   ccache \
