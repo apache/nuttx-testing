@@ -222,8 +222,12 @@ function avr-gcc-toolchain {
   if ! type avr-gcc > /dev/null; then
     case $os in
       Darwin)
+        # Force the use of the gcc8 version due to this issue.  Link can be removed when using latest again
+        # https://github.com/osx-cross/homebrew-avr/issues/205
         brew tap osx-cross/avr
-        brew install avr-gcc
+        brew install avr-gcc@8 --verbose
+        brew link avr-gcc@8 --force --verbose
+        avr-gcc --version
         ;;
     esac
   fi
