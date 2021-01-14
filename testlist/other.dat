@@ -5,14 +5,6 @@
 -avr32dev1:nsh
 -avr32dev1:ostest
 
-# Disable AVR targets on macOS due to homebrew issue
-# https://github.com/osx-cross/homebrew-avr/issues/205
--Darwin,teensy-2\.0:.*
--Darwin,micropendous3:.*
--Darwin,amber:.*
--Darwin,arduino-mega2560:.*
--Darwin,moteino-mega:.*
-
 /renesas/rx65n/rx65n-grrose
 /renesas/rx65n/rx65n-rsk2mb
 -Darwin,rx65n-grrose:.*
