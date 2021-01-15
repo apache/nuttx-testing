@@ -40,6 +40,8 @@ case $os in
     install="python-tools u-boot-tools elf-toolchain gen-romfs kconfig-frontends arm-gcc-toolchain riscv-gcc-toolchain xtensa-esp32-gcc-toolchain avr-gcc-toolchain c-cache binutils"
     mkdir -p ${prebuilt}/homebrew
     export HOMEBREW_CACHE=${prebuilt}/homebrew
+    # https://github.com/osx-cross/homebrew-avr/issues/205#issuecomment-760637996
+    brew update
     ;;
   Linux)
     install="python-tools gen-romfs gperf kconfig-frontends arm-gcc-toolchain mips-gcc-toolchain riscv-gcc-toolchain xtensa-esp32-gcc-toolchain rx-gcc-toolchain c-cache"
