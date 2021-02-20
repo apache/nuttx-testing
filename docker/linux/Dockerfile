@@ -102,49 +102,16 @@ RUN mkdir riscv64-unknown-elf-gcc && \
 ###############################################################################
 FROM nuttx-toolchain-base AS nuttx-toolchain-esp32
 # Download the latest ESP32 GCC toolchain prebuilt by Espressif
-RUN mkdir xtensa-esp32-elf-gcc && \
+RUN mkdir -p xtensa-esp32-elf-gcc && \
   curl -s -L "https://github.com/espressif/crosstool-NG/releases/download/esp-2020r3/xtensa-esp32-elf-gcc8_4_0-esp-2020r3-linux-amd64.tar.gz" \
   | tar -C xtensa-esp32-elf-gcc --strip-components 1 -xz
 
-RUN apt-get update -qq && DEBIAN_FRONTEND="noninteractive" apt-get install -y -qq --no-install-recommends \
-  git \
-  bison \
-  gperf \
-  python3 \
-  python-is-python3 \
-  python3-pip \
-  python3-setuptools \
-  python3-pexpect \
-  make \
-  cmake \
-  ninja-build \
-  ccache \
-  libffi-dev \
-  libssl-dev \
-  libusb-1.0
-
-RUN git clone --depth 1 --shallow-submodules --recursive https://github.com/espressif/esp-idf.git
-# This is unfortunately going to re-download some of the same toolchains, but will only be used in the context of esp-idf
-RUN sed -i "s/^gdbgui.*/gdbgui==0.13.2.0/" esp-idf/requirements.txt
-RUN bash -c "\
-  cd esp-idf && \
-  ./install.sh"
-
-# Provide an option for disabling DOUT mode, so that the default one,
-# DIO, can be used (for instance, for flashing a DevKitC module)
-ARG FLASH_DOUT_ENABLED=y
-# We run this is generate the default bootloader and partition table binaries
-RUN bash -c "\
-  cd esp-idf && \
-  source ./export.sh && \
-  cd examples/get-started/hello_world && \
-  make defconfig && \
-  if [[ '${FLASH_DOUT_ENABLED}' == y ]]; then echo 'CONFIG_ESPTOOLPY_FLASHMODE_DOUT=y' >> sdkconfig; fi && \
-  idf.py bootloader partition_table"
-
-RUN mkdir /tools/blobs
-RUN cp /tools/esp-idf/examples/get-started/hello_world/build/bootloader/bootloader.bin /tools/blobs/
-RUN cp /tools/esp-idf/examples/get-started/hello_world/build/partition_table/partition-table.bin /tools/blobs/
+RUN echo "ESP Binaries: 2021/02/20"
+RUN mkdir -p /tools/blobs && cd /tools/blobs \
+  && curl -s -L "https://github.com/espressif/esp-nuttx-bootloader/releases/download/latest/bootloader-esp32.bin" -o bootloader-esp32.bin \
+  && curl -s -L "https://github.com/espressif/esp-nuttx-bootloader/releases/download/latest/bootloader-esp32c3.bin" -o bootloader-esp32c3.bin \
+  && curl -s -L "https://github.com/espressif/esp-nuttx-bootloader/releases/download/latest/partition-table-esp32.bin" -o partition-table-esp32.bin \
+  && curl -s -L "https://github.com/espressif/esp-nuttx-bootloader/releases/download/latest/partition-table-esp32c3.bin" -o partition-table-esp32c3.bin
 
 ###############################################################################
 # Build image for tool required by Renesas builds
@@ -280,10 +247,9 @@ ENV PATH="/tools/riscv64-unknown-elf-gcc/bin:$PATH"
 
 # ESP32 toolchain
 COPY --from=nuttx-toolchain-esp32 /tools/xtensa-esp32-elf-gcc/ xtensa-esp32-elf-gcc/
-COPY --from=nuttx-toolchain-esp32 /tools/esp-idf/ esp-idf/
 ENV PATH="/tools/xtensa-esp32-elf-gcc/bin:$PATH"
-RUN mkdir -p /tools/blobs/esp32core
-COPY --from=nuttx-toolchain-esp32 /tools/blobs/* /tools/blobs/esp32core/
+RUN mkdir -p /tools/blobs/esp-bins
+COPY --from=nuttx-toolchain-esp32 /tools/blobs/* /tools/blobs/esp-bins/
 RUN pip3 install esptool
 
 # Renesas toolchain
