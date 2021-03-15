@@ -22,8 +22,6 @@
 -Darwin,ubw32:.*
 
 /risc-v,CONFIG_RV32IM_TOOLCHAIN_GNU_RVGL
--gapuino:nsh
--nr5m100-nexys4:nsh
 
 # x86_64-elf-gcc from homebrew doesn't seem to
 # provide __udivdi3 etc for -m32
