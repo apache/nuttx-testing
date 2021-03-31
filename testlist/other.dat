@@ -1,9 +1,8 @@
-# We do not have a toolchain for avr32 outside of Microchip login wall.
-# The work was never upstreamed to GCC.
-
 /avr
 -avr32dev1:nsh
 -avr32dev1:ostest
+# x86_64-elf-gcc from homebrew doesn't seem to
+# provide __udivdi3 etc for -m32
 
 /renesas/rx65n/rx65n-grrose
 /renesas/rx65n/rx65n-rsk2mb
@@ -20,14 +19,10 @@
 -Darwin,pic32mz-starterkit:.*
 -Darwin,sure-pic32mx:.*
 -Darwin,ubw32:.*
+# We do not have a toolchain for avr32 outside of Microchip login wall.
+# The work was never upstreamed to GCC.
 
-/risc-v,CONFIG_RV32IM_TOOLCHAIN_GNU_RVGL
-
-# x86_64-elf-gcc from homebrew doesn't seem to
-# provide __udivdi3 etc for -m32
 /x86
 -Darwin,qemu-i486:.*
 
 /x86_64
-
-/xtensa
