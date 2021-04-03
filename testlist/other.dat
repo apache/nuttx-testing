@@ -8,8 +8,7 @@
 # with the same name
 /mips,CONFIG_MIPS32_TOOLCHAIN_PINGUINOL
 
-/renesas/rx65n/rx65n-grrose
-/renesas/rx65n/rx65n-rsk2mb
+/renesas/rx65n
 
 /x86
 
