@@ -238,9 +238,9 @@ function rx-gcc-toolchain {
 
   if [ ! -f "$prebuilt/renesas-toolchain/rx-elf-gcc/bin/rx-elf-gcc" ]; then
     case $os in
-      Linux)        
-        # Download toolchain source code 
-        # RX toolchain is built from source code. Once prebuilt RX toolchain is made available, the below code snippet can be removed. 
+      Linux)
+        # Download toolchain source code
+        # RX toolchain is built from source code. Once prebuilt RX toolchain is made available, the below code snippet can be removed.
         mkdir -p $prebuilt/renesas-tools/rx/source; cd $prebuilt/renesas-tools/rx/source
         wget --quiet https://gcc-renesas.com/downloads/d.php?f=rx/binutils/4.8.4.201803-gnurx/rx_binutils2.24_2018Q3.tar.gz \
           -O rx_binutils2.24_2018Q3.tar.gz
@@ -252,15 +252,15 @@ function rx-gcc-toolchain {
           -O rx_newlib2.2.0_2018Q3.tar.gz
         tar zxf rx_newlib2.2.0_2018Q3.tar.gz
 
-        # Install binutils          
+        # Install binutils
         cd $prebuilt/renesas-tools/rx/source/binutils; chmod +x ./configure ./mkinstalldirs
         mkdir -p $prebuilt/renesas-tools/rx/build/binutils; cd $prebuilt/renesas-tools/rx/build/binutils
         $prebuilt/renesas-tools/rx/source/binutils/configure --target=rx-elf --prefix=$prebuilt/renesas-toolchain/rx-elf-gcc \
-          --disable-werror 
+          --disable-werror
         make; make install
 
-        # Install gcc          
-        cd $prebuilt/renesas-tools/rx/source/gcc 
+        # Install gcc
+        cd $prebuilt/renesas-tools/rx/source/gcc
         chmod +x ./contrib/download_prerequisites ./configure ./move-if-change ./libgcc/mkheader.sh
         ./contrib/download_prerequisites
         sed -i '1s/^/@documentencoding ISO-8859-1\n/' ./gcc/doc/gcc.texi
@@ -271,10 +271,10 @@ function rx-gcc-toolchain {
         --enable-gold --with-pkgversion=GCC_Build_1.02 --with-newlib --enable-languages=c
         make; make install
 
-        # Install newlib          
+        # Install newlib
         cd $prebuilt/renesas-tools/rx/source/newlib; chmod +x ./configure
         mkdir -p $prebuilt/renesas-tools/rx/build/newlib; cd $prebuilt/renesas-tools/rx/build/newlib
-        $prebuilt/renesas-tools/rx/source/newlib/configure --target=rx-elf --prefix=$prebuilt/renesas-toolchain/rx-elf-gcc 
+        $prebuilt/renesas-tools/rx/source/newlib/configure --target=rx-elf --prefix=$prebuilt/renesas-toolchain/rx-elf-gcc
         make; make install
         rm -rf $prebuilt/renesas-tools/
         ;;
