@@ -1,6 +1,0 @@
-## Summary
-
-## Impact
-
-## Testing
-
